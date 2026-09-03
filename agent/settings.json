@@ -1,0 +1,18 @@
+{
+  "lastChangelogVersion": "0.84.4",
+  "theme": "dark",
+  "defaultProvider": "zai-coding-cn",
+  "defaultModel": "glm-5.3-flash",
+  "defaultThinkingLevel": "high",
+  "collapseChangelog": true,
+  "showCacheMissNotices": true,
+  "hideThinkingBlock": true,
+  "defaultProjectTrust": "always",
+  "packages": [
+    "extensions/btw.ts",
+    "extensions/sketch.ts",
+    "extensions/last-question.ts",
+    "npm:pi-web-access",
+    "git:github.com/DietrichGebert/ponytail"
+  ]
+}

@@ -1,0 +1,17 @@
+# secrets — never commit
+auth.json
+
+# machine-specific state
+agent/sessions/
+agent/caveman-state.json
+agent/models-store.json
+
+# caches / regenerable
+web-search-cache/
+**/node_modules/
+agent/npm/
+agent/git/
+
+# work artifacts
+agent/plans/
+agent/specs/
