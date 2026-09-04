@@ -15,3 +15,6 @@ agent/git/
 # work artifacts
 agent/plans/
 agent/specs/
+
+# python venvs (pdf-reader)
+.venv/
