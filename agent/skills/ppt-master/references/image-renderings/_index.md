@@ -2,15 +2,15 @@
 
 A **rendering** is a visual style family: line quality, texture, depth, material, mood. Lock one rendering per deck — every AI image in the deck shares it.
 
-> **HEX values are not in renderings.** Rendering describes how the image is drawn. The new flow reads exact deck color roles directly from `spec_lock.md colors`; it does not ask for or author a separate image palette. See [`image-generator.md`](../image-generator.md) §2.
+> **HEX values are not in renderings.** Rendering describes how the image is drawn. The new flow starts from the deck's core color anchors in `spec_lock.md colors` and interprets them with the Design Spec/image context; it does not ask for or author a separate image palette. See [`image-generator.md`](../image-generator.md) §2.
 
-> **Deck HEX has hard precedence.** Any color name or sample HEX inside an individual rendering file is illustrative legacy prose and MUST be replaced by the current deck-role values when assembling a prompt. A rendering may change texture, lighting, opacity, and role proportions, but it may not tint, warm-grade, cool-grade, replace, or invent HEX. If its material language requires colors the selected deck roles cannot support, do not offer that rendering in Stage 2.
+> **Core deck identity has precedence.** Any sample HEX inside an individual rendering file is illustrative legacy prose. Prompt assembly replaces identity roles with the current deck anchors, then may derive coherent tints, light/shadow transitions, material colors, and atmospheric hues from the rendering and image context. Do not replace the deck identity with an unrelated palette. When one derived tone becomes a reusable semantic role across images/pages, promote it to a named lock row.
 
 ---
 
 ## 1. Catalog (20 renderings)
 
-Each rendering has its own file with: style paragraph, line / texture / depth notes, deck HEX usage, and a fewshot prompt snippet. **Read only the file for the rendering you pick** — never glob the directory.
+Each rendering keeps its own authoritative file with: style paragraph, line / texture / depth notes, deck HEX usage, and a fewshot prompt snippet. Read this index alone while choosing a direction. Only after a preset or custom bases are fixed may the active role read the selected sibling files: one file for a preset, every exact `image_rendering_references` file for a catalog-based custom, and none for a novel custom. Never glob the directory or read an unselected sibling. Whether AI imagery is recommended remains a separate source decision; Image_Generator follows the same selected-only rule.
 
 ### 1.1 Modern / commercial (the corporate-PPT main field)
 
@@ -54,7 +54,7 @@ Each rendering has its own file with: style paragraph, line / texture / depth no
 
 ### 1.5 Escape hatch — `custom`
 
-Whenever proposed image usage includes `ai`, Stage 2 authors one separate, visible custom rendering proposal in addition to the preset cards. It uses `rendering: custom` plus a complete behavior paragraph, remains initially unselected, and enters the confirmed contract only when the user chooses it. A template-backed proposal must honor inherited identity and the confirmed template-application plan.
+Every coordinated Stage-2 direction carries one complete `rendering: custom` candidate even when `recommend.image_usage` does not include `ai`. The UI keeps rendering controls hidden until the current source selection includes AI, then exposes the three already-authored project candidates without another backend recommendation. The 20 fixed renderings remain lower-level single-select alternatives. A template-backed proposal must honor inherited identity and the confirmed template-application plan.
 
 **Hard rule — `rendering_behavior` prose**:
 
@@ -62,14 +62,16 @@ Whenever proposed image usage includes `ai`, Stage 2 authors one separate, visib
 |---|---|
 | Length | One paragraph, 2-5 sentences |
 | Axes covered | line / texture / depth / material / mood (same as preset files) |
-| Forbidden | Naming a competing preset ("like blueprint but warmer") |
+| Catalog basis | Freeze every exact id from this index, then read only those named files before synthesis |
 
 ```yaml
 - image_rendering: custom
 - image_rendering_behavior: "Hand-screened poster aesthetic — slightly misregistered halftone overlays, 3 flat ink colors with visible dot pattern at 12% opacity, no gradients, no anti-aliased edges; reads as silkscreen print."
 ```
 
-**Hard rule**: the custom candidate is mandatory when AI images are proposed; selecting `custom` is a tail-case, not the default. See [`strategist-image.md`](../strategist-image.md) for the Stage-2 carrier and downstream lock behavior.
+**Hard rule**: three complete rendering candidates are mandatory in every fresh Stage-2 direction set; AI source recommendation remains independent. See [`strategist-image.md`](../strategist-image.md) for the Stage-2 carrier and downstream lock behavior.
+
+Write `image_rendering_references` only when the confirmed custom direction actually uses catalog material. A custom may use zero, one, or many renderings: keep one when it owns the whole specialized treatment, or include every rendering that contributes a distinct executable job across line, texture, depth, material, or mood. Reference count has no fixed cap; count is an outcome, not a target. A four-basis direction may assign `vector-illustration` to silhouette clarity, `minimalist-swiss` to negative-space composition, `screen-print` to restrained halftone texture, and `warm-scene` to light and mood; list all four ids. Omit every rendering whose contribution cannot be stated and never add a second merely to imply synthesis. A genuinely new rendering with no catalog source omits the field and proceeds from its standalone behavior; never invent a reference merely to legitimize `custom`.
 
 ---
 
@@ -105,6 +107,6 @@ Match `design_spec.md d` (mode + `visual_style`) against this table. First match
 
 1. From `design_spec.md` extract `d. Style` mode + descriptor.
 2. Find the matching row above; pick the primary recommendation.
-3. `read_file image-renderings/<chosen>.md` and apply its style paragraph when assembling each prompt per [`image-generator.md`](../image-generator.md) §4. (For `custom`, this step is replaced by the consumption branch in [`image-generator.md`](../image-generator.md) Step 2 — no preset file to read.)
+3. For a preset, read `image-renderings/<chosen>.md`. For `custom`, read every file named in `image_rendering_references`, then synthesize them under the confirmed behavior; with no references, use the novel behavior directly. Apply the result when assembling prompts per [`image-generator.md`](../image-generator.md) §4.
 
 **Lock for the whole deck.** Don't change rendering between images in the same deck.

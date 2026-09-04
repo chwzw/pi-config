@@ -9,7 +9,11 @@ Image tools cover formula rendering, prompt-based AI generation, web image searc
 
 ## `latex_render.py`
 
-Manifest-driven LaTeX formula renderer. Strategist writes `images/formula_manifest.json` after the Typography confirmation; this script renders only those declared formulas to transparent PNGs and writes dimensions back into the manifest.
+Manifest-driven LaTeX formula renderer. Default Generate has Strategist write
+`images/formula_manifest.json` after Typography confirmation; Quick Generate
+has the current agent write the same resource manifest without confirmation.
+This script renders only those declared formulas to transparent PNGs and writes
+dimensions back into the manifest.
 
 ```bash
 python3 scripts/latex_render.py <project_path>
@@ -37,23 +41,26 @@ Manifest shape:
 }
 ```
 
-Output files land directly under `project/images/`. Formula filenames should use a shared `formula_` prefix, e.g. `formula_001.png`. The default provider chain is `codecogs,quicklatex,mathpad,wikimedia`; each provider is tried automatically until one succeeds, and the winning provider is recorded back into the manifest. `--providers` or manifest-level `providers` may override the order, but all four are available as no-key fallbacks. Formula PNGs are transparent by default. `background` is the temporary render matte and local background-removal reference; set `transparent: false` only when an opaque final formula asset is intentional. The script does not scan `spec_lock.md` or source documents for `$...$`; formula selection is a Strategist decision.
+Output files land directly under `project/images/`. Formula filenames should use a shared `formula_` prefix, e.g. `formula_001.png`. The default provider chain is `codecogs,quicklatex,mathpad,wikimedia`; each provider is tried automatically until one succeeds, and the winning provider is recorded back into the manifest. `--providers` or manifest-level `providers` may override the order, but all four are available as no-key fallbacks. Formula PNGs are transparent by default. `background` is the temporary render matte and local background-removal reference; set `transparent: false` only when an opaque final formula asset is intentional. The script does not scan `spec_lock.md` or source documents for `$...$`; formula selection belongs to the active resource owner.
 
 ## `image_gen.py`
 
 Unified image generation entry point.
 
-This script is the **Path A** API/proxy executor for generated images. In the
-PPT pipeline, always check the confirmed `image_ai_path` before running manifest
-mode: `host-native` uses the host's image tool directly and must not run
-`image_gen.py --manifest`; use `image_gen.py --render-md` only for its
-read-only Markdown sidecar.
+This script is the **Path A** API/proxy executor for generated images. Default
+Generate checks `design_spec.md §I / AI Image Acquisition Path` before manifest
+mode: only `api` / `auto` permits Path A; a missing or unknown value fails
+closed and returns to Step 4 recovery. Quick Generate has no Design Spec: use
+the explicit active-context path when supplied, otherwise `auto` selects the
+A → B → C chain defined in
+[`image-generator.md`](../../references/image-generator.md) §7 without asking.
+In either profile, `host-native` uses the host image tool directly and `manual`
+uses the read-only Markdown sidecar.
 
 ```bash
 python3 scripts/image_gen.py "A modern futuristic workspace"
 python3 scripts/image_gen.py "Abstract tech background" --aspect_ratio 16:9 --image_size 4K
 python3 scripts/image_gen.py "Concept car" -o projects/demo/images
-python3 scripts/image_gen.py "Beautiful landscape" -n "low quality, blurry, watermark"
 python3 scripts/image_gen.py --list-backends
 ```
 
@@ -156,15 +163,64 @@ MINIMAX_API_KEY=your-api-key
 # MINIMAX_MODEL=image-01
 ```
 
+## `image_treat.py`
+
+Create a non-destructive PNG derivative from one bitmap already prepared under
+`<project_path>/images/`. Use this only when a slide needs a baked bitmap effect;
+crop, mask, rotation, mirror, opacity, shadow, scrim, outline, and overlap remain
+native SVG/PPT treatments. This tool does not perform semantic background
+removal: use `slice_images.py --alpha` for flat-color keys, an already prepared
+RGBA asset or the active host image editor for a standalone cutout, and
+[`image-generator.md`](../../references/image-generator.md) §4.4 only for
+registered subject/base layers.
+
+```bash
+python3 scripts/image_treat.py projects/demo hero.jpg \
+  --output hero_soft.png --brightness 0.9 --contrast 1.1 --blur 12
+
+python3 scripts/image_treat.py projects/demo hero.jpg \
+  --output hero_duotone.png --duotone "#14213D" "#FCA311"
+```
+
+Supported operations are brightness, contrast, desaturation/grayscale,
+duotone, and Gaussian blur. They compose in a fixed order: brightness →
+contrast → tone treatment → blur. Desaturation, grayscale, and duotone are
+mutually exclusive. At least one option must produce a real change; animated
+or multi-frame sources are rejected rather than reduced to one frame.
+
+Both input and output are bare filenames directly under `images/`; output must
+be a new `.png` file. The tool keeps the EXIF-corrected display dimensions,
+leaves any alpha mask unchanged, and never overwrites the source or an existing
+derivative. If `images/image_sources.json` contains the source filename, the
+new record inherits that legal provenance and records `derived_from` plus the
+ordered `treatments`. Run `analyze_images.py` after all planned derivatives are
+ready so the inventory reflects the files that SVG authoring will consume.
+
 ## `analyze_images.py`
 
-Analyze images in a project directory before writing the design spec or composing slide layouts.
+Analyze objective image-file facts in a project directory before writing the
+design spec or authoring SVG.
 
 ```bash
 python3 scripts/analyze_images.py <project_path>/images
 ```
 
-Use this instead of opening image files directly when following the project workflow.
+The tool does not resolve a canvas or recommend a left/right, top/bottom, or
+other slide layout. Its atomic CSV records EXIF-corrected native dimensions and
+`AspectRatio`, the objective aspect-ratio category, optional source
+`SourceDisplayRatio`, format, actual transparent-pixel presence, usage count,
+and bitmap/vector capability facts. An empty folder rewrites a header-only
+report; unreadable supported files still refresh the report and produce a
+non-zero exit.
+
+Use this as the default factual inventory; it does not perform semantic image
+understanding or choose composition. Generate planning follows the Strategist's
+context-first boundary: source context, captions / alt text / titles, filenames,
+user notes, and existing resource records come first. Only an already-selected
+provided/web asset whose focal-safe crop, overlay contrast, or quiet region
+remains materially ambiguous may be inspected for that placement; this never
+reopens selection or provenance, never bulk-opens the image folder, and never
+restores routine readback of AI-generated images.
 
 ## `image_search.py`
 
@@ -178,25 +234,27 @@ python3 scripts/image_search.py "offshore wind farm" \
 
 For multiple web rows, `--batch images/image_queries.json` searches them concurrently (modest default, `--concurrency N` / `IMAGE_SEARCH_CONCURRENCY` to tune) instead of one call per row — the web sister of `image_gen.py --manifest`. Schema and status semantics: [`image-searcher.md`](../../references/image-searcher.md) §5.
 
-Providers (Openverse and Wikimedia work with no key; configure Pexels / Pixabay for better stock-photo quality):
+Providers (Pexels / Pixabay are tried first when keyed; Openverse and Wikimedia are zero-config fallbacks):
 
 | Provider | Config | Strength |
 |---|---|---|
-| `openverse` | zero-config | fallback aggregator: Wikimedia + Flickr + museums + rawpixel |
-| `wikimedia` | zero-config | educational, scientific, geographic, historical |
 | `pexels` | recommended: `PEXELS_API_KEY` | modern stock photography, people, workplace, lifestyle |
 | `pixabay` | recommended: `PIXABAY_API_KEY` | broad type coverage including photos and illustrations |
+| `openverse` | zero-config | fallback aggregator: Wikimedia + Flickr + museums + rawpixel |
+| `wikimedia` | zero-config | educational, scientific, geographic, historical |
 
-Default search chain (when `--provider` is unset): zero-config providers first, then keyed providers whose API key is set in the environment. Keyed providers without a key are silently skipped. For polished visual decks, configure at least one keyed provider.
+Default search chain (when `--provider` is unset): configured Pexels, configured Pixabay, Openverse, then Wikimedia. Missing keyed credentials are silently skipped. Keyed providers broaden stock-photo coverage but are optional; zero-config providers remain valid.
 
 `image_search.py` uses the same `.env` lookup order as `image_gen.py`, so skill installs can keep `PEXELS_API_KEY` / `PIXABAY_API_KEY` in `~/.ppt-master/.env`.
 
 Query guidance:
 
+Keep the Design Spec §VIII `Reference` as the full visual/crop intent; write a separate concise provider query for this CLI. Start with the shortest phrase that preserves identity, but retain exact multi-word names and necessary disambiguators beyond four words.
+
 | Case | Pattern |
 |---|---|
-| Generic stock concept | `boardroom meeting, professional editorial photography, natural light` |
-| China-specific landmark | Official Chinese place name + concrete scene |
+| Generic stock concept | `boardroom meeting` |
+| China-specific landmark | Precise official place/identity name plus necessary geography |
 | Avoid | Negative prompt wording such as `not tourist snapshot` |
 
 License filter:
@@ -231,11 +289,11 @@ Output:
 
 - Image saved to the specified output directory (auto-converts webp → jpg via Pillow when the filename extension demands)
 - `image_sources.json` manifest with full provenance (provider, license, license_tier, author, source URL, dimensions, attribution_text)
-- Manifest is idempotent on `filename` — rerunning replaces that entry only
+- Manifest is idempotent on `filename` and written atomically; damaged existing provenance blocks replacement
 
 Allowed licenses (default): CC0, Public Domain, Pexels License, Pixabay Content License, CC BY, CC BY-SA. Auto-rejected: CC BY-NC, CC BY-ND, CC BY-NC-SA, CC BY-NC-ND, all rights reserved, unknown.
 
-The full role-level reference (intent → query translation, on-slide attribution visual specification) is in [`references/image-searcher.md`](../../references/image-searcher.md).
+The full role-level reference (intent → query translation, on-slide attribution contract) is in [`references/image-searcher.md`](../../references/image-searcher.md).
 
 ## `gemini_watermark_remover.py`
 

@@ -1,26 +1,26 @@
 # Modes — Index
 
-A **mode** is the deck's **narrative + persuasion skeleton** — how the argument is organized and advanced across pages. Lock **one mode per deck**; it shapes page sequencing, title voice, page-structure tendencies, and speaker-notes register.
+A **mode** is the deck's **narrative + persuasion skeleton** — how the argument is organized and advanced across pages. Resolve **one mode per deck**; Default locks it, while Quick keeps it only in active context. It shapes page sequencing, title voice, page-structure tendencies, and speaker-notes register.
 
-> A mode is *not* a visual style. **Mode = how you argue; visual style = how it looks** (see [`visual-styles/_index.md`](../visual-styles/_index.md)). The two are locked independently — any mode pairs with any visual style (a `pyramid` deck can look `swiss-minimal` or `dark-tech`).
+> A mode is *not* a visual style. **Mode = how you argue; visual style = how it looks** (see [`visual-styles/_index.md`](../visual-styles/_index.md)). Resolve the two independently — any mode pairs with any visual style (a `pyramid` deck can look `swiss-minimal` or `dark-tech`).
 
 ---
 
 ## 1. Catalog (5 modes)
 
-Each mode has its own file with: narrative skeleton, page-structure tendencies, speaker-notes register, and a page skeleton example. **Read only the file for the mode you lock** — never glob the directory.
+Each mode keeps its own authoritative file with: narrative skeleton, page-structure tendencies, speaker-notes register, and a page skeleton example. Read this index alone while choosing a direction. Only after a preset or custom bases are fixed may the active role read the selected sibling files: one file for a preset, every exact `mode_references` file for a catalog-based custom, and none for a novel custom. Never glob the directory or read an unselected sibling.
 
 | Mode | Narrative skeleton | Best for |
 |---|---|---|
-| [`pyramid`](./pyramid.md) | Conclusion first; MECE arguments; every datum carries a comparison | Decision support, analysis, strategy, board / exec reports |
+| [`pyramid`](./pyramid.md) | Conclusion first; structured arguments; data contextualized with supported comparisons where useful | Decision support, analysis, strategy, board / exec reports |
 | [`narrative`](./narrative.md) | Story arc — situation → tension → resolution; suspense and turns | Pitches, case studies, brand journeys, fundraising |
 | [`instructional`](./instructional.md) | Concept decomposition; step-by-step; parallel exposition | Training, tutorials, explainers, knowledge sharing |
 | [`showcase`](./showcase.md) | Visual-led impact; big imagery / numbers; emotional rhythm | Launches, brand reveals, event / promo decks |
 | [`briefing`](./briefing.md) | Neutral, complete, scannable; topic titles, even weight, no thesis | Status updates, reference decks, catalogs, meeting packs, FAQs |
 
-> The five are **argument strategies, not a taxonomy of communication purposes**. A presentation may inform + align + request a decision at once; that composite intent stays as open prose in the Stage-1 communication contract. Stage 2 chooses the mode that best carries the dominant body-page spine, or one concrete `custom` act sequence when no preset can serve the stated priority / sequence.
+> The five are **argument strategies, not a taxonomy of communication purposes**. A presentation may inform + align + request a decision at once; that composite intent stays as open prose in Default's Stage-1 communication contract or Quick's active brief. Default uses this index to map each whole solution intent into one project-specific custom behavior; Quick resolves one preset or custom direction directly.
 >
-> **A mode is a lens, not a mandate over the user's own structure.** When the user brings their own outline, it is authoritative: transcribe it into `design_spec.md §IX` as given — page order and titles preserved — and let the mode govern only voice / register and page-internal treatment. A mode never reorders a user's pages or rewrites their given titles (mode is Reference-strength; a user-authored outline is exactly the override). When the user gives no structure, the mode does the structural lifting. To lay an outline out with the least reshaping, `briefing` imposes the lightest skeleton.
+> **A mode is a lens, not a mandate over an explicitly preserved structure.** Default applies the confirmed `content_divergence`; Quick applies the equivalent user-stated or active-context boundary to a supplied outline. An ordinary source outline is a Reference that the mode may regroup, reorder, or retitle while preserving its facts and intended relationships. Preserve page order, titles, or wording only when the user presents the outline as the final page plan or explicitly requests that boundary. When the user gives no structure, the mode does the structural lifting. To keep reshaping light, `briefing` imposes the least skeleton.
 
 ---
 
@@ -40,23 +40,23 @@ Each mode has its own file with: narrative skeleton, page-structure tendencies, 
 
 | Torn between | …the first when | …the second when |
 |---|---|---|
-| `pyramid` / `briefing` | it must land a recommendation — conclusion-first, every number compared | it must inform completely without arguing — topic titles, even weight |
+| `pyramid` / `briefing` | it must land a recommendation — conclusion-first, figures contextualized toward a decision | it must inform completely without arguing — topic titles, even weight |
 | `narrative` / `pyramid` | the point lands through a story arc, tension → resolution | the point lands as a conclusion stated up front, then supported |
-| `narrative` / `showcase` | an argument travels through the story | presence leads — minimal copy, one big visual per page |
+| `narrative` / `showcase` | an argument travels through the story | presence leads — concise copy and a clear visual focus |
 | `instructional` / `briefing` | the goal is to build understanding step by step | the goal is to lay out a complete reference to scan |
 
-> "Keynote-style" is a *mode* request, not a visual style — it means showcase pacing (one big idea per page, full-bleed hero, reveal rhythm), skinned by whatever visual style fits the brand (`swiss-minimal` clean, `dark-tech` dramatic, `glassmorphism` premium). Don't reach for a "keynote" visual style — there isn't one, by design.
+> "Keynote-style" is a *mode* request, not a visual style — it means showcase pacing (a clear primary idea, hero-scale visual treatment, reveal rhythm), skinned by whatever visual style fits the brand (`swiss-minimal` clean, `dark-tech` dramatic, `glassmorphism` premium). Don't reach for a "keynote" visual style — there isn't one, by design.
 
 ---
 
 ## 3. How to use
 
-1. Strategist reads this index at confirmation `d. Layer 1`.
-2. Preselect one mode from the auto-selection table + the confirmed communication contract and source structure; separately author the visible AI custom candidate required by §4.
-3. Record the confirmed mode and rationale in `design_spec.md`, then project `- mode: <name>` into `spec_lock.md`.
-4. Executor reads **only** `modes/<locked-mode>.md` at generation entry — never globs this directory.
+| Active profile | Use |
+|---|---|
+| Default Generate | Strategist reads only this index while mapping three whole solution intents, freezes each custom direction's exact bases, then reads only their deduplicated detail files. Executor reads the confirmed preset file or exact custom references. |
+| Quick Generate | The current main agent reads only this index while deciding, then reads the resolved preset or exact custom bases and keeps that one direction in active context without Design Spec/lock. |
 
-**Lock scope**: deck-wide (one mode per deck). The five are the catalog you select from; if the structure is genuinely mixed, pick the mode of the body pages and let pages vary within it, or recommend a `custom` blend (§4). Recommend the best fit; the user confirms.
+**Resolution scope**: deck-wide (one mode per deck). The five are the catalog you select from; if the structure is genuinely mixed, pick the mode of the body pages and let pages vary within it, or use a warranted `custom` blend (§4). Default recommends and confirms; Quick decides directly.
 
 ---
 
@@ -64,10 +64,14 @@ Each mode has its own file with: narrative skeleton, page-structure tendencies, 
 
 `custom` holds **any bespoke narrative direction the five don't give as-is** — and what *kind* of thing it is doesn't matter. It might be a nameable cadence (dialectic 正反合, myth-vs-reality, countdown / Top-N, Socratic), a deliberate multi-act fusion of several modes, or the user's own feel for how the deck should carry (confrontational here, detached there). Don't try to taxonomize it.
 
-**Always author the candidate; select it only when warranted.** Stage 2 includes one visible, non-empty AI custom proposal beside the five presets, spelling out the cadence / fusion / posture in plain language. It is initially unselected and does not replace the best-fit preset recommendation unless the user already supplied that exact custom direction; with a template, it must fit available prototype capacity. When the user selects it, the editable prose is saved as `mode: custom` plus `mode_behavior`; otherwise it remains recommendation-only. The Strategist crystallizes a selected custom direction in the Design Spec first, then projects the same pair to `spec_lock.md`. The Executor follows that prose in place of a preset file. (This records the intent so it survives 20 pages of generation — the Executor only ever reads `spec_lock.md`, never the chat.)
+**Default candidates**: All three coordinated Stage-2 directions use literal `custom` plus a visible, non-empty `mode_behavior`. A direction may specialize one preset, fuse several modes, or define a novel cadence; it fits any installed template capacity. The fixed five remain lower-level single-select alternatives. Strategist crystallizes the confirmed current value in the Design Spec first, then projects its behavior and actual catalog basis to `spec_lock.md`.
 
-> **One value per deck — fusion is *one* `custom`, not several modes.** A deck always locks a single `mode`. A multi-mode blend is expressed as **one** `mode: custom` whose `mode_behavior` paragraph describes the acts — never by locking several modes.
+**Quick custom**: do not display a candidate set. Use `custom` only when a project-specific specialization or fusion serves the deck better than one preset; retain the behavior and exact bases in active context and persist nothing.
+
+**Mandatory — select before detail reading**: Use this index to freeze every catalog source actually used, then read only those exact files before writing the behavior. A custom may use zero, one, or many sources: keep one when it owns the whole specialized cadence, or include every mode that owns a distinct executable act, posture, title voice, rhythm, or register. Reference count has no fixed cap; count is an outcome, not a target. A three-basis direction may use `pyramid` for a conclusion-first opening, `narrative` for the risk-tension act, and `instructional` for the closing action sequence; it reads those three files and writes all three ids beside `mode_behavior`. Quick retains its bases only in active context. Omit every source whose contribution cannot be stated, never add a second merely to imply synthesis, and do not open candidates for comparison after this gate. A genuinely new cadence names and reads no catalog source.
+
+> **One value per deck — fusion is *one* `custom`, not several modes.** A deck always resolves a single `mode`. A multi-mode blend is expressed as **one** custom behavior whose paragraph describes the acts — never as several simultaneous modes.
 >
-> **First ask whether it's really fusion.** A locked mode is a *tendency*, not a cage: a `narrative` deck can still carry one analytical (pyramid-style) page, an `instructional` deck one showcase reveal — that is leaning within a dominant mode, and needs **no** `custom`. Reach for `custom` only when there is genuinely no single dominant spine.
+> **Custom need not mean fusion.** A Default recommendation can specialize one dominant preset for this project's act sequence, title voice, rhythm, and register. Quick or a lower-level manual choice may still use the fixed preset directly.
 
-**The one thing to avoid**: selecting `custom` as a *dodge* — defaulting to it because picking among the five takes judgment. The custom candidate is mandatory; a custom lock is not. When a preset genuinely fits, keep that preset selected. A user-stated direction remains authoritative the same way a user-supplied outline is — see the lens-not-mandate note in §1.
+**Forbidden — empty customization**: Do not relabel an index row as `custom`. The behavior must state the project-specific cadence, posture, title voice, page rhythm, or act sequence that the fixed preset alone does not encode. A user-stated direction remains authoritative the same way a user-supplied outline is — see the lens-not-mandate note in §1.
