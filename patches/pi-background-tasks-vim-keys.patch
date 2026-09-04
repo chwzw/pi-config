@@ -1,0 +1,92 @@
+--- a/src/ui/background-tasks-manager.ts	1985-10-26 16:15:00.000000000 +0800
++++ b/src/ui/background-tasks-manager.ts	2026-09-04 16:17:37.650289388 +0800
+@@ -258,7 +258,7 @@
+   }
+ 
+   handleInput(data: string): void {
+-    const stopAllKey = data === 'a' || data === 'A' || data === 'K';
++    const stopAllKey = data === 'D';
+     if (!stopAllKey) this.confirmStopAllArmed = false;
+     this.actionMessage = undefined;
+ 
+@@ -299,13 +299,13 @@
+       }
+       return;
+     }
+-    if (matchesKey(data, 'up')) {
++    if (matchesKey(data, 'up') || data === 'k') {
+       this.selectedIndex = Math.max(0, this.selectedIndex - 1);
+       this.ensureSelectionVisible();
+       this.tui.requestRender();
+       return;
+     }
+-    if (matchesKey(data, 'down')) {
++    if (matchesKey(data, 'down') || data === 'j') {
+       this.selectedIndex = Math.min(tasks.length - 1, this.selectedIndex + 1);
+       this.ensureSelectionVisible();
+       this.tui.requestRender();
+@@ -329,12 +329,12 @@
+       this.openDetail(task.id);
+       return;
+     }
+-    if (data === 'k') {
++    if (data === 'd') {
+       const task = tasks[this.selectedIndex];
+       if (task) void this.stopTaskFromUi(task);
+       return;
+     }
+-    if (data === 'K' || data === 'a' || data === 'A') {
++    if (data === 'D') {
+       void this.stopAllFromUi();
+       return;
+     }
+@@ -364,11 +364,11 @@
+       this.tui.requestRender();
+       return;
+     }
+-    if (matchesKey(data, 'up')) {
++    if (matchesKey(data, 'up') || data === 'k') {
+       this.scrollDetail(-1);
+       return;
+     }
+-    if (matchesKey(data, 'down')) {
++    if (matchesKey(data, 'down') || data === 'j') {
+       this.scrollDetail(1);
+       return;
+     }
+@@ -390,7 +390,7 @@
+       void this.rerunTaskFromUi(task);
+       return;
+     }
+-    if (data === 'k' && task) {
++    if (data === 'd' && task) {
+       void this.stopTaskFromUi(task);
+       return;
+     }
+@@ -463,7 +463,7 @@
+     }
+     if (!this.confirmStopAllArmed) {
+       this.confirmStopAllArmed = true;
+-      this.actionMessage = `Press a/K again to stop all ${formatCount(running.length)} running task${pluralSuffix(running.length)}.`;
++      this.actionMessage = `Press D again to stop all ${formatCount(running.length)} running task${pluralSuffix(running.length)}.`;
+       this.tui.requestRender();
+       return;
+     }
+@@ -684,7 +684,7 @@
+       'bg tasks focused',
+       subtitle,
+       body,
+-      ` ${this.theme.fg('dim', `↑/↓ select · Enter logs · k stop · a stop all · h ${this.showHistory ? 'hide' : 'show'} history · R rerun · c path · x close`)}`,
++      ` ${this.theme.fg('dim', `j/k select · Enter logs · d stop · D stop all · h ${this.showHistory ? 'hide' : 'show'} history · R rerun · c path · x close`)}`,
+       width,
+     );
+   }
+@@ -733,7 +733,7 @@
+     body.push(...this.renderOutputBox(width - 4));
+     if (this.actionMessage) body.push(this.theme.fg('warning', ` ${this.actionMessage}`));
+     const subtitle = `${task.id} · ${task.status === 'running' ? 'live tail refreshes every second' : 'final output'}`;
+-    const footer = ` ${this.theme.fg('dim', '↑/↓ scroll · ← list · r refresh · k stop · R rerun · c path · x close')}`;
++    const footer = ` ${this.theme.fg('dim', 'j/k scroll · ← list · r refresh · d stop · R rerun · c path · x close')}`;
+     return this.frame(`bg: ${truncateChars(name, 64)}`, subtitle, body, footer, width);
+   }
+ 
