@@ -2,19 +2,21 @@
 auth.json
 
 # machine-specific state
-agent/sessions/
-agent/caveman-state.json
-agent/models-store.json
+sessions/
+caveman-state.json
+models-store.json
+trust.json
+run-history.jsonl
+missions/
+skills-removed-backup.tar.gz
 
 # caches / regenerable
 web-search-cache/
 **/node_modules/
-agent/npm/
-agent/git/
+npm/
+git/
+learn/.venv/
 
 # work artifacts
-agent/plans/
-agent/specs/
-
-# python venvs (pdf-reader)
-.venv/
+plans/
+specs/

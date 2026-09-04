@@ -1,0 +1,26 @@
+{
+  "httpProxy": "http://127.0.0.1:7890",
+  "lastChangelogVersion": "0.84.4",
+  "theme": "dark",
+  "defaultProvider": "zai-coding-cn",
+  "defaultModel": "glm-5.3-flash",
+  "defaultThinkingLevel": "high",
+  "hideThinkingBlock": true,
+  "packages": [
+    "npm:pi-subagents",
+    "npm:ponytail",
+    "git:github.com/DietrichGebert/ponytail",
+    "npm:pi-background-tasks",
+    "npm:pi-web-access",
+    "npm:@narumitw/pi-goal",
+    "git:github.com/amosblomqvist/pi-dictate",
+    "git:github.com/amosblomqvist/pi-observational-memory"
+  ],
+  "tuiMode": "regular",
+  "steeringMode": "all",
+  "treeFilterMode": "default",
+  "enableSkillCommands": true,
+  "modelThinkingLevels": {
+    "zai-coding-cn/glm-5.3": "max"
+  }
+}
