@@ -1,1 +1,1 @@
-be brief and concise.
+Be concise and brief.

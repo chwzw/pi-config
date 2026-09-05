@@ -1,6 +1,6 @@
 {
   "httpProxy": "http://127.0.0.1:7890",
-  "lastChangelogVersion": "0.84.4",
+  "lastChangelogVersion": "0.85.1",
   "theme": "dark",
   "defaultProvider": "zai-coding-cn",
   "defaultModel": "glm-5.3-flash",
