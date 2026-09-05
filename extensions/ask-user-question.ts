@@ -243,12 +243,12 @@ async function askSingleChoice(
 				return;
 			}
 
-			if (matchesKey(data, Key.up)) {
+			if (matchesKey(data, Key.up) || data === "k") {
 				optionIndex = Math.max(0, optionIndex - 1);
 				refresh();
 				return;
 			}
-			if (matchesKey(data, Key.down)) {
+			if (matchesKey(data, Key.down) || data === "j") {
 				optionIndex = Math.min(allOptions.length - 1, optionIndex + 1);
 				refresh();
 				return;
@@ -400,12 +400,12 @@ async function askMultiChoice(
 				return;
 			}
 
-			if (matchesKey(data, Key.up)) {
+			if (matchesKey(data, Key.up) || data === "k") {
 				optionIndex = Math.max(0, optionIndex - 1);
 				refresh();
 				return;
 			}
-			if (matchesKey(data, Key.down)) {
+			if (matchesKey(data, Key.down) || data === "j") {
 				optionIndex = Math.min(allItems.length - 1, optionIndex + 1);
 				refresh();
 				return;
@@ -544,7 +544,6 @@ async function askMultiChoice(
 // mutex on globalThis so separate extension files can share it without
 // importing each other.
 const SHARED_UI_LOCK_KEY = "__piSharedUiLock";
-function getSharedUiLock() {
 	const g = globalThis as any;
 	if (!g[SHARED_UI_LOCK_KEY]) {
 		let chain: Promise<void> = Promise.resolve();
