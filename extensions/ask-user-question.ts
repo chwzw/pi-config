@@ -62,24 +62,19 @@ const OptionSchema = Type.Object({
 	}),
 	value: Type.Optional(
 		Type.String({
-			description:
-				"Optional machine-readable value returned for the option. Defaults to the label.",
+			description: "Optional machine-readable value returned for the option. Defaults to the label.",
 		}),
 	),
-	description: Type.Optional(
-		Type.String({ description: "Optional extra detail shown below the option." }),
-	),
+	description: Type.Optional(Type.String({ description: "Optional extra detail shown below the option." })),
 });
 
 const AskUserQuestionParams = Type.Object({
 	question: Type.String({
-		description:
-			"The single question to ask the user. Ask exactly one question per tool call.",
+		description: "The single question to ask the user. Ask exactly one question per tool call.",
 	}),
 	details: Type.Optional(
 		Type.String({
-			description:
-				"Optional extra context or instructions shown under the question.",
+			description: "Optional extra context or instructions shown under the question.",
 		}),
 	),
 	options: Type.Optional(
@@ -90,17 +85,12 @@ const AskUserQuestionParams = Type.Object({
 	),
 	multiSelect: Type.Optional(
 		Type.Boolean({
-			description:
-				"Set to true to allow multiple answers to be selected for a question.",
+			description: "Set to true to allow multiple answers to be selected for a question.",
 		}),
 	),
 });
 
-function normalizeOptions(
-	options:
-		| Array<{ label: string; value?: string; description?: string }>
-		| undefined,
-): AskOption[] {
+function normalizeOptions(options: Array<{ label: string; value?: string; description?: string }> | undefined): AskOption[] {
 	return (options || [])
 		.map((option) => ({
 			label: option.label.trim(),
@@ -111,9 +101,7 @@ function normalizeOptions(
 }
 
 function getOtherLabel(options: AskOption[]): string {
-	return options.some((option) => option.label.toLowerCase() === "other")
-		? "Other (custom)"
-		: "Other";
+	return options.some((option) => option.label.toLowerCase() === "other") ? "Other (custom)" : "Other";
 }
 
 function createEditorTheme(theme: any): EditorTheme {
@@ -129,12 +117,7 @@ function createEditorTheme(theme: any): EditorTheme {
 	};
 }
 
-function addWrapped(
-	lines: string[],
-	text: string,
-	width: number,
-	indent = "",
-): void {
+function addWrapped(lines: string[], text: string, width: number, indent = ""): void {
 	const contentWidth = Math.max(1, width - indent.length);
 	for (const line of wrapTextWithAnsi(text, contentWidth)) {
 		lines.push(truncateToWidth(`${indent}${line}`, width));
@@ -185,57 +168,26 @@ function buildStructuredResult(
 	} as AskUserQuestionResultDetails;
 }
 
-function cancelledResult(
-	question: string,
-	mode: AskUserQuestionMode,
-	context?: string,
-) {
+function cancelledResult(question: string, mode: AskUserQuestionMode, context?: string) {
 	const message = "User cancelled the question";
 	return {
 		content: [{ type: "text" as const, text: message }],
-		details: buildStructuredResult(
-			"cancelled",
-			question,
-			mode,
-			[],
-			context,
-			message,
-		),
+		details: buildStructuredResult("cancelled", question, mode, [], context, message),
 	};
 }
 
-function unavailableResult(
-	question: string,
-	mode: AskUserQuestionMode,
-	message: string,
-	context?: string,
-) {
+function unavailableResult(question: string, mode: AskUserQuestionMode, message: string, context?: string) {
 	return {
 		content: [{ type: "text" as const, text: message }],
-		details: buildStructuredResult(
-			"unavailable",
-			question,
-			mode,
-			[],
-			context,
-			message,
-		),
+		details: buildStructuredResult("unavailable", question, mode, [], context, message),
 	};
 }
 
-function buildResult(
-	question: string,
-	context: string | undefined,
-	mode: AskUserQuestionMode,
-	answers: AskAnswer[],
-) {
+function buildResult(question: string, context: string | undefined, mode: AskUserQuestionMode, answers: AskAnswer[]) {
 	let text: string;
 	if (mode === "text") {
 		const answer = answers[0];
-		text =
-			answer.label.trim().length > 0
-				? `User answered: ${answer.label}`
-				: "User submitted an empty response";
+		text = answer.label.trim().length > 0 ? `User answered: ${answer.label}` : "User submitted an empty response";
 	} else if (mode === "single-select") {
 		text = `User selected: ${formatAnswerForModel(answers[0])}`;
 	} else {
@@ -256,144 +208,129 @@ async function askSingleChoice(
 ): Promise<AskAnswer | null> {
 	const otherLabel = getOtherLabel(options);
 	const allOptions: DisplayOption[] = [
-		...options.map((option, index) => ({
-			...option,
-			id: `option:${index}`,
-			index: index + 1,
-		})),
+		...options.map((option, index) => ({ ...option, id: `option:${index}`, index: index + 1 })),
 		{ id: "other", label: otherLabel, value: "__other__", isOther: true },
 	];
 
-	return ctx.ui.custom<AskAnswer | null>(
-		(
-			tui: any,
-			theme: any,
-			_kb: any,
-			done: (result: AskAnswer | null) => void,
-		) => {
-			let optionIndex = 0;
-			let editMode = false;
-			let cachedLines: string[] | undefined;
-			let cachedWidth = -1;
-			const editor = new Editor(tui, createEditorTheme(theme));
+	return ctx.ui.custom<AskAnswer | null>((tui: any, theme: any, _kb: any, done: (result: AskAnswer | null) => void) => {
+		let optionIndex = 0;
+		let editMode = false;
+		let cachedLines: string[] | undefined;
+		let cachedWidth = -1;
+		const editor = new Editor(tui, createEditorTheme(theme));
 
-			editor.onSubmit = (value) => {
-				const trimmed = value.trim();
-				if (!trimmed) return;
-				done({ type: "other", label: trimmed, value: trimmed });
-			};
+		editor.onSubmit = (value) => {
+			const trimmed = value.trim();
+			if (!trimmed) return;
+			done({ type: "other", label: trimmed, value: trimmed });
+		};
 
-			function refresh() {
-				cachedLines = undefined;
-				tui.requestRender();
-			}
+		function refresh() {
+			cachedLines = undefined;
+			tui.requestRender();
+		}
 
-			function handleInput(data: string) {
-				if (editMode) {
-					if (matchesKey(data, Key.escape)) {
-						editMode = false;
-						editor.setText("");
-						refresh();
-						return;
-					}
-					editor.handleInput(data);
-					refresh();
-					return;
-				}
-
-				if (matchesKey(data, Key.up) || data === "k") {
-					optionIndex = Math.max(0, optionIndex - 1);
-					refresh();
-					return;
-				}
-				if (matchesKey(data, Key.down) || data === "j") {
-					optionIndex = Math.min(allOptions.length - 1, optionIndex + 1);
-					refresh();
-					return;
-				}
-				if (matchesKey(data, Key.enter)) {
-					const selected = allOptions[optionIndex];
-					if (selected.isOther) {
-						editMode = true;
-						editor.setText("");
-						refresh();
-						return;
-					}
-					done({
-						type: "option",
-						label: selected.label,
-						value: selected.value,
-						index: selected.index!,
-					});
-					return;
-				}
+		function handleInput(data: string) {
+			if (editMode) {
 				if (matchesKey(data, Key.escape)) {
-					done(null);
+					editMode = false;
+					editor.setText("");
+					refresh();
+					return;
+				}
+				editor.handleInput(data);
+				refresh();
+				return;
+			}
+
+			if (matchesKey(data, Key.up)) {
+				optionIndex = Math.max(0, optionIndex - 1);
+				refresh();
+				return;
+			}
+			if (matchesKey(data, Key.down)) {
+				optionIndex = Math.min(allOptions.length - 1, optionIndex + 1);
+				refresh();
+				return;
+			}
+			if (matchesKey(data, Key.enter)) {
+				const selected = allOptions[optionIndex];
+				if (selected.isOther) {
+					editMode = true;
+					editor.setText("");
+					refresh();
+					return;
+				}
+				done({
+					type: "option",
+					label: selected.label,
+					value: selected.value,
+					index: selected.index!,
+				});
+				return;
+			}
+			if (matchesKey(data, Key.escape)) {
+				done(null);
+			}
+		}
+
+		function render(width: number): string[] {
+			// The cache MUST be keyed on width: pi-tui calls requestRender() but NOT
+			// invalidate() on terminal resize, so render() can be re-entered with a
+			// new width. Returning stale wider lines trips the TUI width guard and
+			// crashes the process.
+			if (cachedLines && cachedWidth === width) return cachedLines;
+
+			const lines: string[] = [];
+			const add = (text: string) => lines.push(truncateToWidth(text, width));
+
+			add(theme.fg("accent", "─".repeat(width)));
+			addWrapped(lines, theme.fg("text", ` ${question}`), width);
+			if (context) {
+				lines.push("");
+				addWrapped(lines, theme.fg("muted", ` ${context}`), width);
+			}
+			lines.push("");
+
+			for (let i = 0; i < allOptions.length; i++) {
+				const option = allOptions[i];
+				const selected = i === optionIndex;
+				const prefix = selected ? theme.fg("accent", "> ") : "  ";
+				const label = option.isOther ? option.label : `${option.index}. ${option.label}`;
+				const styled = selected ? theme.fg("accent", label) : theme.fg("text", label);
+				add(`${prefix}${styled}`);
+				if (option.description) {
+					addWrapped(lines, theme.fg("muted", option.description), width, "     ");
 				}
 			}
 
-			function render(width: number): string[] {
-				// The cache MUST be keyed on width: pi-tui calls requestRender() but NOT
-				// invalidate() on terminal resize, so render() can be re-entered with a
-				// new width. Returning stale wider lines trips the TUI width guard and
-				// crashes the process.
-				if (cachedLines && cachedWidth === width) return cachedLines;
-
-				const lines: string[] = [];
-				const add = (text: string) => lines.push(truncateToWidth(text, width));
-
-				add(theme.fg("accent", "─".repeat(width)));
-				addWrapped(lines, theme.fg("text", ` ${question}`), width);
-				if (context) {
-					lines.push("");
-					addWrapped(lines, theme.fg("muted", ` ${context}`), width);
+			if (editMode) {
+				lines.push("");
+				add(theme.fg("muted", " Write your custom answer:"));
+				for (const line of editor.render(Math.max(1, width - 2))) {
+					add(` ${line}`);
 				}
 				lines.push("");
-
-				for (let i = 0; i < allOptions.length; i++) {
-					const option = allOptions[i];
-					const selected = i === optionIndex;
-					const prefix = selected ? theme.fg("accent", "> ") : "  ";
-					const label = option.isOther
-						? option.label
-						: `${option.index}. ${option.label}`;
-					const styled = selected
-						? theme.fg("accent", label)
-						: theme.fg("text", label);
-					add(`${prefix}${styled}`);
-					if (option.description) {
-						addWrapped(lines, theme.fg("muted", option.description), width, "     ");
-					}
-				}
-
-				if (editMode) {
-					lines.push("");
-					add(theme.fg("muted", " Write your custom answer:"));
-					for (const line of editor.render(Math.max(1, width - 2))) {
-						add(` ${line}`);
-					}
-					lines.push("");
-					add(theme.fg("dim", " Enter to submit • Esc to go back"));
-				} else {
-					lines.push("");
-					add(theme.fg("dim", " ↑↓/j/k navigate • Enter select • Esc cancel"));
-				}
-
-				add(theme.fg("accent", "─".repeat(width)));
-				cachedLines = lines;
-				cachedWidth = width;
-				return lines;
+				add(theme.fg("dim", " Enter to submit • Esc to go back"));
+			} else {
+				lines.push("");
+				add(theme.fg("dim", " ↑↓ navigate • Enter select • Esc cancel"));
 			}
 
-			return {
-				render,
-				invalidate: () => {
-					cachedLines = undefined;
-				},
-				handleInput,
-			};
-		},
-	);
+			add(theme.fg("accent", "─".repeat(width)));
+			cachedLines = lines;
+			cachedWidth = width;
+			return lines;
+		}
+
+		return {
+			render,
+			invalidate: () => {
+				cachedLines = undefined;
+			},
+			handleInput,
+		};
+	});
 }
 
 async function askMultiChoice(
@@ -408,222 +345,197 @@ async function askMultiChoice(
 		id: `option:${index}`,
 		index: index + 1,
 	}));
-	const submitItem: DisplayOption = {
-		id: "submit",
-		label: "Submit",
-		value: "__submit__",
-		isSubmit: true,
-	};
+	const submitItem: DisplayOption = { id: "submit", label: "Submit", value: "__submit__", isSubmit: true };
 	const allItems: DisplayOption[] = [
 		...choiceItems,
 		{ id: "other", label: otherLabel, value: "__other__", isOther: true },
 		submitItem,
 	];
 
-	return ctx.ui.custom<AskAnswer[] | null>(
-		(
-			tui: any,
-			theme: any,
-			_kb: any,
-			done: (result: AskAnswer[] | null) => void,
-		) => {
-			let optionIndex = 0;
-			let editMode = false;
-			let cachedLines: string[] | undefined;
-			let cachedWidth = -1;
-			const selected = new Map<string, AskAnswer>();
-			const editor = new Editor(tui, createEditorTheme(theme));
+	return ctx.ui.custom<AskAnswer[] | null>((tui: any, theme: any, _kb: any, done: (result: AskAnswer[] | null) => void) => {
+		let optionIndex = 0;
+		let editMode = false;
+		let cachedLines: string[] | undefined;
+		let cachedWidth = -1;
+		const selected = new Map<string, AskAnswer>();
+		const editor = new Editor(tui, createEditorTheme(theme));
 
-			editor.onSubmit = (value) => {
-				const trimmed = value.trim();
-				if (!trimmed) return;
-				selected.set("other", { type: "other", label: trimmed, value: trimmed });
-				editMode = false;
-				refresh();
-			};
+		editor.onSubmit = (value) => {
+			const trimmed = value.trim();
+			if (!trimmed) return;
+			selected.set("other", { type: "other", label: trimmed, value: trimmed });
+			editMode = false;
+			refresh();
+		};
 
-			function refresh() {
-				cachedLines = undefined;
-				tui.requestRender();
+		function refresh() {
+			cachedLines = undefined;
+			tui.requestRender();
+		}
+
+		function toggleOption(item: DisplayOption) {
+			if (selected.has(item.id)) {
+				selected.delete(item.id);
+			} else {
+				selected.set(item.id, {
+					type: "option",
+					label: item.label,
+					value: item.value,
+					index: item.index!,
+				});
 			}
+			refresh();
+		}
 
-			function toggleOption(item: DisplayOption) {
-				if (selected.has(item.id)) {
-					selected.delete(item.id);
-				} else {
-					selected.set(item.id, {
-						type: "option",
-						label: item.label,
-						value: item.value,
-						index: item.index!,
-					});
-				}
-				refresh();
-			}
-
-			function handleInput(data: string) {
-				if (editMode) {
-					if (matchesKey(data, Key.escape)) {
-						editMode = false;
-						editor.setText(selected.get("other")?.label || "");
-						refresh();
-						return;
-					}
-					editor.handleInput(data);
-					refresh();
-					return;
-				}
-
-				if (matchesKey(data, Key.up) || data === "k") {
-					optionIndex = Math.max(0, optionIndex - 1);
-					refresh();
-					return;
-				}
-				if (matchesKey(data, Key.down) || data === "j") {
-					optionIndex = Math.min(allItems.length - 1, optionIndex + 1);
-					refresh();
-					return;
-				}
-
-				const current = allItems[optionIndex];
-				if (matchesKey(data, Key.space)) {
-					if (current.isSubmit) return;
-					if (current.isOther) {
-						if (selected.has("other")) {
-							selected.delete("other");
-							refresh();
-						} else {
-							editMode = true;
-							editor.setText("");
-							refresh();
-						}
-						return;
-					}
-					toggleOption(current);
-					return;
-				}
-
-				if (matchesKey(data, Key.enter)) {
-					if (current.isSubmit) {
-						if (selected.size > 0) {
-							done(sortAnswers(Array.from(selected.values())));
-						}
-						return;
-					}
-					if (current.isOther) {
-						editMode = true;
-						editor.setText(selected.get("other")?.label || "");
-						refresh();
-						return;
-					}
-					toggleOption(current);
-					return;
-				}
-
+		function handleInput(data: string) {
+			if (editMode) {
 				if (matchesKey(data, Key.escape)) {
-					done(null);
+					editMode = false;
+					editor.setText(selected.get("other")?.label || "");
+					refresh();
+					return;
 				}
+				editor.handleInput(data);
+				refresh();
+				return;
 			}
 
-			function render(width: number): string[] {
-				// The cache MUST be keyed on width: pi-tui calls requestRender() but NOT
-				// invalidate() on terminal resize, so render() can be re-entered with a
-				// new width. Returning stale wider lines trips the TUI width guard and
-				// crashes the process.
-				if (cachedLines && cachedWidth === width) return cachedLines;
+			if (matchesKey(data, Key.up)) {
+				optionIndex = Math.max(0, optionIndex - 1);
+				refresh();
+				return;
+			}
+			if (matchesKey(data, Key.down)) {
+				optionIndex = Math.min(allItems.length - 1, optionIndex + 1);
+				refresh();
+				return;
+			}
 
-				const lines: string[] = [];
-				const add = (text: string) => lines.push(truncateToWidth(text, width));
-
-				add(theme.fg("accent", "─".repeat(width)));
-				addWrapped(lines, theme.fg("text", ` ${question}`), width);
-				if (context) {
-					lines.push("");
-					addWrapped(lines, theme.fg("muted", ` ${context}`), width);
+			const current = allItems[optionIndex];
+			if (matchesKey(data, Key.space)) {
+				if (current.isSubmit) return;
+				if (current.isOther) {
+					if (selected.has("other")) {
+						selected.delete("other");
+						refresh();
+					} else {
+						editMode = true;
+						editor.setText("");
+						refresh();
+					}
+					return;
 				}
+				toggleOption(current);
+				return;
+			}
+
+			if (matchesKey(data, Key.enter)) {
+				if (current.isSubmit) {
+					if (selected.size > 0) {
+						done(sortAnswers(Array.from(selected.values())));
+					}
+					return;
+				}
+				if (current.isOther) {
+					editMode = true;
+					editor.setText(selected.get("other")?.label || "");
+					refresh();
+					return;
+				}
+				toggleOption(current);
+				return;
+			}
+
+			if (matchesKey(data, Key.escape)) {
+				done(null);
+			}
+		}
+
+		function render(width: number): string[] {
+			// The cache MUST be keyed on width: pi-tui calls requestRender() but NOT
+			// invalidate() on terminal resize, so render() can be re-entered with a
+			// new width. Returning stale wider lines trips the TUI width guard and
+			// crashes the process.
+			if (cachedLines && cachedWidth === width) return cachedLines;
+
+			const lines: string[] = [];
+			const add = (text: string) => lines.push(truncateToWidth(text, width));
+
+			add(theme.fg("accent", "─".repeat(width)));
+			addWrapped(lines, theme.fg("text", ` ${question}`), width);
+			if (context) {
 				lines.push("");
+				addWrapped(lines, theme.fg("muted", ` ${context}`), width);
+			}
+			lines.push("");
 
-				for (let i = 0; i < allItems.length; i++) {
-					const item = allItems[i];
-					const isFocused = i === optionIndex;
-					const prefix = isFocused ? theme.fg("accent", "> ") : "  ";
+			for (let i = 0; i < allItems.length; i++) {
+				const item = allItems[i];
+				const isFocused = i === optionIndex;
+				const prefix = isFocused ? theme.fg("accent", "> ") : "  ";
 
-					if (item.isSubmit) {
-						const label =
-							selected.size > 0
-								? `✓ ${item.label} (${selected.size} selected)`
-								: `○ ${item.label}`;
-						const styled = isFocused
-							? theme.fg("accent", label)
-							: theme.fg(selected.size > 0 ? "success" : "dim", label);
-						add(`${prefix}${styled}`);
-						continue;
-					}
-
-					if (item.isOther) {
-						const other = selected.get("other");
-						const marker = other ? "[x]" : "[ ]";
-						const suffix = other ? ` — ${other.label}` : "";
-						const styled = isFocused
-							? theme.fg("accent", `${marker} ${item.label}${suffix}`)
-							: theme.fg(
-									other ? "success" : "text",
-									`${marker} ${item.label}${suffix}`,
-								);
-						add(`${prefix}${styled}`);
-						continue;
-					}
-
-					const checked = selected.has(item.id);
-					const marker = checked ? "[x]" : "[ ]";
-					const label = `${marker} ${item.index}. ${item.label}`;
+				if (item.isSubmit) {
+					const label = selected.size > 0 ? `✓ ${item.label} (${selected.size} selected)` : `○ ${item.label}`;
 					const styled = isFocused
 						? theme.fg("accent", label)
-						: theme.fg(checked ? "success" : "text", label);
+						: theme.fg(selected.size > 0 ? "success" : "dim", label);
 					add(`${prefix}${styled}`);
-					if (item.description) {
-						addWrapped(lines, theme.fg("muted", item.description), width, "     ");
-					}
+					continue;
 				}
 
-				if (editMode) {
-					lines.push("");
-					add(theme.fg("muted", " Write your custom answer:"));
-					for (const line of editor.render(Math.max(1, width - 2))) {
-						add(` ${line}`);
-					}
-					lines.push("");
-					add(theme.fg("dim", " Enter to save • Esc to go back"));
-				} else {
-					lines.push("");
-					if (selected.size === 0) {
-						add(
-							theme.fg("warning", " Select at least one answer before submitting."),
-						);
-					}
-					add(
-						theme.fg(
-							"dim",
-							" ↑↓/j/k navigate • Space toggle • Enter edit/submit • Esc cancel",
-						),
-					);
+				if (item.isOther) {
+					const other = selected.get("other");
+					const marker = other ? "[x]" : "[ ]";
+					const suffix = other ? ` — ${other.label}` : "";
+					const styled = isFocused
+						? theme.fg("accent", `${marker} ${item.label}${suffix}`)
+						: theme.fg(other ? "success" : "text", `${marker} ${item.label}${suffix}`);
+					add(`${prefix}${styled}`);
+					continue;
 				}
 
-				add(theme.fg("accent", "─".repeat(width)));
-				cachedLines = lines;
-				cachedWidth = width;
-				return lines;
+				const checked = selected.has(item.id);
+				const marker = checked ? "[x]" : "[ ]";
+				const label = `${marker} ${item.index}. ${item.label}`;
+				const styled = isFocused
+					? theme.fg("accent", label)
+					: theme.fg(checked ? "success" : "text", label);
+				add(`${prefix}${styled}`);
+				if (item.description) {
+					addWrapped(lines, theme.fg("muted", item.description), width, "     ");
+				}
 			}
 
-			return {
-				render,
-				invalidate: () => {
-					cachedLines = undefined;
-				},
-				handleInput,
-			};
-		},
-	);
+			if (editMode) {
+				lines.push("");
+				add(theme.fg("muted", " Write your custom answer:"));
+				for (const line of editor.render(Math.max(1, width - 2))) {
+					add(` ${line}`);
+				}
+				lines.push("");
+				add(theme.fg("dim", " Enter to save • Esc to go back"));
+			} else {
+				lines.push("");
+				if (selected.size === 0) {
+					add(theme.fg("warning", " Select at least one answer before submitting."));
+				}
+				add(theme.fg("dim", " ↑↓ navigate • Space toggle • Enter edit/submit • Esc cancel"));
+			}
+
+			add(theme.fg("accent", "─".repeat(width)));
+			cachedLines = lines;
+			cachedWidth = width;
+			return lines;
+		}
+
+		return {
+			render,
+			invalidate: () => {
+				cachedLines = undefined;
+			},
+			handleInput,
+		};
+	});
 }
 
 // Shared UI mutex. ctx.ui.custom()/editor can only handle one active call at
@@ -640,16 +552,12 @@ function getSharedUiLock() {
 			withLock<T>(fn: () => T | Promise<T>): Promise<T> {
 				const prev = chain;
 				let release: () => void;
-				chain = new Promise<void>((r) => {
-					release = r;
-				});
+				chain = new Promise<void>((r) => { release = r; });
 				return prev.then(fn).finally(() => release!());
 			},
 		};
 	}
-	return g[SHARED_UI_LOCK_KEY] as {
-		withLock<T>(fn: () => T | Promise<T>): Promise<T>;
-	};
+	return g[SHARED_UI_LOCK_KEY] as { withLock<T>(fn: () => T | Promise<T>): Promise<T> };
 }
 const sharedUiLock = getSharedUiLock();
 
@@ -679,31 +587,19 @@ export default function askUserQuestion(pi: ExtensionAPI) {
 		async execute(_toolCallId, params, signal, _onUpdate, ctx) {
 			const options = normalizeOptions(params.options);
 			const context = params.details?.trim() || undefined;
-			const mode: AskUserQuestionMode =
-				options.length === 0
-					? "text"
-					: params.multiSelect
-						? "multi-select"
-						: "single-select";
+			const mode: AskUserQuestionMode = options.length === 0 ? "text" : params.multiSelect ? "multi-select" : "single-select";
 
 			if (signal?.aborted) {
 				return cancelledResult(params.question, mode, context);
 			}
 
 			if (!ctx.hasUI) {
-				return unavailableResult(
-					params.question,
-					mode,
-					"ask_user_question requires interactive mode UI",
-					context,
-				);
+				return unavailableResult(params.question, mode, "ask_user_question requires interactive mode UI", context);
 			}
 
 			return withUILock(async () => {
 				if (mode === "text") {
-					const editorTitle = context
-						? `${params.question}\n\n${context}`
-						: params.question;
+					const editorTitle = context ? `${params.question}\n\n${context}` : params.question;
 					const answer = await ctx.ui.editor(editorTitle);
 					if (answer === undefined) {
 						return cancelledResult(params.question, mode, context);
@@ -714,24 +610,14 @@ export default function askUserQuestion(pi: ExtensionAPI) {
 				}
 
 				if (mode === "single-select") {
-					const answer = await askSingleChoice(
-						ctx,
-						params.question,
-						context,
-						options,
-					);
+					const answer = await askSingleChoice(ctx, params.question, context, options);
 					if (!answer) {
 						return cancelledResult(params.question, mode, context);
 					}
 					return buildResult(params.question, context, mode, [answer]);
 				}
 
-				const answers = await askMultiChoice(
-					ctx,
-					params.question,
-					context,
-					options,
-				);
+				const answers = await askMultiChoice(ctx, params.question, context, options);
 				if (!answers) {
 					return cancelledResult(params.question, mode, context);
 				}
@@ -740,22 +626,13 @@ export default function askUserQuestion(pi: ExtensionAPI) {
 		},
 
 		renderCall(args, theme) {
-			const options = normalizeOptions(
-				args.options as
-					| Array<{ label: string; value?: string; description?: string }>
-					| undefined,
-			);
-			let text =
-				theme.fg("toolTitle", theme.bold("ask_user_question ")) +
-				theme.fg("muted", args.question);
+			const options = normalizeOptions(args.options as Array<{ label: string; value?: string; description?: string }> | undefined);
+			let text = theme.fg("toolTitle", theme.bold("ask_user_question ")) + theme.fg("muted", args.question);
 			if (args.multiSelect) {
 				text += theme.fg("dim", " [multi-select]");
 			}
 			if (options.length > 0) {
-				const labels = [
-					...options.map((option) => option.label),
-					getOtherLabel(options),
-				].join(", ");
+				const labels = [...options.map((option) => option.label), getOtherLabel(options)].join(", ");
 				text += `\n${theme.fg("dim", `  Options: ${labels}`)}`;
 			}
 			return new Text(text, 0, 0);
@@ -773,11 +650,7 @@ export default function askUserQuestion(pi: ExtensionAPI) {
 			}
 
 			if (details.status === "unavailable") {
-				return new Text(
-					theme.fg("warning", details.message || "ask_user_question unavailable"),
-					0,
-					0,
-				);
+				return new Text(theme.fg("warning", details.message || "ask_user_question unavailable"), 0, 0);
 			}
 
 			const lines = details.answers.map((answer) => {
