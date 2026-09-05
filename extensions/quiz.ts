@@ -497,12 +497,12 @@ async function askSingleChoice(
 				}
 
 				// focus === "options"
-				if (matchesKey(data, Key.up)) {
+				if (matchesKey(data, Key.up) || data === "k") {
 					optionIndex = Math.max(0, optionIndex - 1);
 					refresh();
 					return;
 				}
-				if (matchesKey(data, Key.down)) {
+				if (matchesKey(data, Key.down) || data === "j") {
 					optionIndex = Math.min(dontKnowNav, optionIndex + 1);
 					refresh();
 					return;
@@ -715,12 +715,12 @@ async function askMultiChoice(
 				}
 
 				// focus === "options"
-				if (matchesKey(data, Key.up)) {
+				if (matchesKey(data, Key.up) || data === "k") {
 					optionIndex = Math.max(0, optionIndex - 1);
 					refresh();
 					return;
 				}
-				if (matchesKey(data, Key.down)) {
+				if (matchesKey(data, Key.down) || data === "j") {
 					optionIndex = Math.min(allItems.length - 1, optionIndex + 1);
 					refresh();
 					return;
