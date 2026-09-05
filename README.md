@@ -2,6 +2,15 @@
 
 My [pi coding agent](https://github.com/badlogic/pi-mono) config. Repo root is `~/.pi/agent` itself.
 
+## New machine setup
+
+```bash
+git clone git@github.com:chwzw/pi-config.git /tmp/pi-config \
+  && bash /tmp/pi-config/setup.sh
+```
+
+Clones to `~/.pi/agent` (backs up any existing dir, restores `auth.json`/`trust.json`/`sessions/`), installs extension deps. Re-run to pull latest.
+
 ## Layout
 
 - `extensions/` — custom TypeScript extensions: `ask-user-question`, `cd`, `caveman-auto`, `btw`, `context-bar-footer`, `last-question`, `herdr-agent-state`, etc.
