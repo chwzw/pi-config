@@ -544,6 +544,8 @@ async function askMultiChoice(
 // mutex on globalThis so separate extension files can share it without
 // importing each other.
 const SHARED_UI_LOCK_KEY = "__piSharedUiLock";
+
+function getSharedUiLock() {
 	const g = globalThis as any;
 	if (!g[SHARED_UI_LOCK_KEY]) {
 		let chain: Promise<void> = Promise.resolve();
