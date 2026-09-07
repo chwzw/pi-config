@@ -11,6 +11,7 @@ missions/
 skills-removed-backup.tar.gz
 
 # caches / regenerable
+bin/
 web-search-cache/
 **/node_modules/
 npm/
