@@ -21,3 +21,6 @@ learn/.venv/
 # work artifacts
 plans/
 specs/
+
+# python caches
+**/__pycache__/

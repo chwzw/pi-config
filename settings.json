@@ -21,6 +21,7 @@
   "treeFilterMode": "default",
   "enableSkillCommands": true,
   "modelThinkingLevels": {
-    "zai-coding-cn/glm-5.3": "max"
+    "zai-coding-cn/glm-5.3": "max",
+    "zai-coding-cn/glm-5.3-flash": "max"
   }
 }

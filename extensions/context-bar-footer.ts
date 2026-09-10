@@ -165,13 +165,21 @@ export default function (pi: ExtensionAPI) {
 
 					const lines = [truncateToWidth(theme.fg("dim", pwd), width, theme.fg("dim", "...")), statsLine];
 
-					// -- Extension statuses (ponytail, etc.) —
-					const statuses = Array.from(footerData.getExtensionStatuses().entries())
-						.sort(([a], [b]) => a.localeCompare(b))
-						.map(([, text]) => sanitizeStatusText(text));
-					if (statuses.length > 0) {
-						lines.push(truncateToWidth(statuses.join(" "), width, theme.fg("dim", "...")));
-					}
+					// -- Extension statuses — modes (caveman/ponytail) on their own line,
+					// everything else (background-tasks dock, etc.) on a separate line —
+					const MODE_KEYS = new Set(["caveman", "ponytail"]);
+					const entries = Array.from(footerData.getExtensionStatuses().entries())
+						.sort(([a], [b]) => a.localeCompare(b));
+					const modeText = entries
+						.filter(([k]) => MODE_KEYS.has(k))
+						.map(([, text]) => sanitizeStatusText(text))
+						.join(" ");
+					const otherText = entries
+						.filter(([k]) => !MODE_KEYS.has(k))
+						.map(([, text]) => sanitizeStatusText(text))
+						.join(" ");
+					if (otherText) lines.push(truncateToWidth(otherText, width, theme.fg("dim", "...")));
+					if (modeText) lines.push(truncateToWidth(modeText, width, theme.fg("dim", "...")));
 					return lines;
 				},
 			};
