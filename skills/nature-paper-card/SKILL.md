@@ -1,6 +1,7 @@
 ---
 name: nature-paper-card
 description: Build a source-grounded deep-reading Paper Card for one scientific paper, preprint, PDF, DOI, arXiv page, publisher article, or pasted paper text. Use when the user asks for a Paper Card, deep-reading literature card, single-paper deep analysis, module-by-module analysis, experiment-to-claim evidence chain, conclusion-boundary audit, critical analysis, knowledge connections, or candidate research ideas. Produce the fixed Sections 01-16 covering bibliographic position, research question, background route, pain point, core insight, method and module logic, essential formulas, experiment-to-claim evidence, conclusion boundaries, author-stated limitations, critical analysis, learned knowledge, knowledge connections, and testable research ideas. Do not use for full-paper bilingual translation, formal peer-review reports, batch literature monitoring, academic-English collection, comprehension quizzes, or public-article writing.
+disable-model-invocation: true
 ---
 
 # Nature Paper Card - Router

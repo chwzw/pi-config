@@ -3,6 +3,7 @@ name: nature-downloader
 description: Use when a user needs lawful academic full text, CNKI institutional access, English OA retrieval, publisher API access, institutional browser fallback, or supporting information downloads.
 metadata:
   compatibility: Requires Node.js 22+ and Python 3. CNKI, Web Access, and SI routes additionally require the user's authenticated Chrome session and remote debugging. Uses only lawful OA, publisher API, and user-authorized institutional access.
+disable-model-invocation: true
 ---
 
 # Nature Literature Downloader

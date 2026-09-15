@@ -7,6 +7,7 @@ metadata:
   hermes:
     tags: [research, experiment, logging, feishu, obsidian, automation]
     related_skills: [nature-literature-pipeline, feishu-cli-integration, obsidian]
+disable-model-invocation: true
 ---
 
 # experiment-log — 实验日志标准化

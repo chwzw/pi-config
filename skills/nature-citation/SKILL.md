@@ -14,6 +14,7 @@ description: >-
   学术写作引用、写论文加引用、写paper找文献、加参考文献、配文献、引用文献、文献支撑.
 metadata:
   author: Yuan1z skill, refactored into static/dynamic layers
+disable-model-invocation: true
 ---
 
 # Nature Citation — Router

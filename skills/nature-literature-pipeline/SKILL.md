@@ -9,6 +9,7 @@ metadata:
   hermes:
     tags: [research, literature, pipeline, cron, automation, discovery]
     related_skills: [nature-academic-search, nature-citation, arxiv, zotero]
+disable-model-invocation: true
 ---
 
 # Nature Literature Pipeline

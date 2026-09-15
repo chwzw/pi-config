@@ -4,6 +4,7 @@ description: Build full-paper Chinese-English side-by-side, figure/table/equatio
 metadata:
   version: "2.1.1"
   author: Community contribution, refactored into static/dynamic layers
+disable-model-invocation: true
 ---
 
 # Full-Paper Markdown Reader — Router

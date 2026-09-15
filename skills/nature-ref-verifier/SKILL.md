@@ -4,6 +4,7 @@ description: >-
   对学术文献逐条执行多源交叉验证，逐字段对比作者、标题、年份、卷期、页码，
   标记卷年/DOI年冲突、作者顺序异常、页码偏差等问题，输出结构化验证报告。
   可批量处理整篇论文/开题报告的参考文献列表，也可单条校验，支持与 Zotero 同步修正。
+disable-model-invocation: true
 ---
 
 # nature-ref-verifier — 学术参考文献多源验证技能

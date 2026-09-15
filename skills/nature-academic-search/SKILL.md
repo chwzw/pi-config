@@ -11,6 +11,7 @@ description: >-
   严格他引、他引判定、排除自引、谁引用了我的文章、引用我的文章的人有没有大牛、
   院士引用、校长引用、院长引用、杰青引用、长江学者引用、Fellow引用、文章引用表、
   指定文章引用数、严格他引数、整理成表格.
+disable-model-invocation: true
 ---
 
 # Academic Search — Router

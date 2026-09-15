@@ -13,6 +13,7 @@ description: >-
   数据共享、代码可用性、学术写作数据声明、写数据声明、数据存放、数据仓库选择.
 metadata:
   author: Yuan1z skill, refactored into static/dynamic layers
+disable-model-invocation: true
 ---
 
 # Nature Data Availability — Router

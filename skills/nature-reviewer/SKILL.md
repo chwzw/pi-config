@@ -8,6 +8,7 @@ description: >-
   Minor Comments, and blocking flags. For multiple reviewers, keep every reviewer mutually
   blind in a separate context, freeze all reports before comparison, and create any synthesis
   only afterward as a separate editor/author-facing artifact.
+disable-model-invocation: true
 ---
 
 # Nature Reviewer Assessment Skill
