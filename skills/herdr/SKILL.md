@@ -1,11 +1,23 @@
 ---
 name: herdr
-description: "Control Herdr, a terminal multiplexer for coding agents. Use only when the user explicitly mentions Herdr or asks to use Herdr to inspect or control panes, tabs, workspaces, commands, or another agent. Do not use merely because a task could benefit from a background terminal, delegation, or parallel work. Requires HERDR_ENV=1."
+description: "Control Herdr, a terminal multiplexer for coding agents — inspect and drive panes, tabs, workspaces, commands, and other agents; run isolated repros in a disposable named session; triage open herdr issues; audit herdr release readiness. Use only when the user explicitly mentions Herdr or asks to use Herdr; do not use merely because a task could benefit from a background terminal, delegation, or parallel work. Requires HERDR_ENV=1."
 ---
 
 # Herdr
 
 Herdr organizes terminals into workspaces, tabs, and panes, recognizes coding agents running inside panes, and exposes the current session through the `herdr` CLI.
+
+This file is the hub for the herdr family. Three repository-workflow sibling skills are not
+advertised to the model separately (they cost ~320 tokens per request together), so route
+explicitly — read the matching file before doing that work:
+
+| Task | Read |
+| --- | --- |
+| Isolated repro in a disposable named session | `~/.pi/agent/skills/herdr-throwaway-repro/SKILL.md` |
+| Triage open herdr issues (user says "triage") | `~/.pi/agent/skills/herdr-triage/SKILL.md` |
+| Pre-release / release-readiness audit | `~/.pi/agent/skills/herdr-pre-release-audit/SKILL.md` |
+
+Everything below is the core CLI guide and applies to all four.
 
 Before issuing any control command, verify that this agent is running inside a Herdr-managed pane:
 

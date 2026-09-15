@@ -1,4 +1,5 @@
 ---
+disable-model-invocation: true
 name: herdr-throwaway-repro
 description: Create and control a disposable named Herdr session from inside an existing Herdr session. Use for isolated Herdr runtime, pane, terminal, process, API, persistence, or agent reproductions that should be driven through the CLI/API without touching the default session.
 ---

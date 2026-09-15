@@ -6,6 +6,7 @@ import {
 	Text,
 	matchesKey,
 	truncateToWidth,
+	visibleWidth,
 	wrapTextWithAnsi,
 } from "@mariozechner/pi-tui";
 import { Type } from "@sinclair/typebox";
@@ -211,6 +212,24 @@ function addWrapped(lines: string[], text: string, width: number, indent = ""): 
 	const contentWidth = Math.max(1, width - indent.length);
 	for (const line of wrapTextWithAnsi(text, contentWidth)) {
 		lines.push(truncateToWidth(`${indent}${line}`, width));
+	}
+}
+
+// Render a label with a leading prefix (e.g. "> ") on the first line and
+// matching-width spaces on wrapped continuations, so long option labels are
+// fully visible (the previous add(prefix+label) silently truncated them).
+function pushWrappedLabel(lines: string[], prefix: string, text: string, width: number): void {
+	const prefixWidth = visibleWidth(prefix);
+	if (prefixWidth >= width) {
+		lines.push(truncateToWidth(prefix, width));
+		return;
+	}
+	const contentWidth = Math.max(1, width - prefixWidth);
+	const wrapped = wrapTextWithAnsi(text, contentWidth);
+	const indent = " ".repeat(prefixWidth);
+	for (let i = 0; i < wrapped.length; i++) {
+		const lead = i === 0 ? prefix : indent;
+		lines.push(truncateToWidth(`${lead}${wrapped[i]}`, width));
 	}
 }
 
@@ -561,7 +580,7 @@ async function askSingleChoice(
 					const prefix = selected ? theme.fg("accent", "> ") : "  ";
 					const label = `${option.index}. ${option.label}`;
 					const styled = selected ? theme.fg("accent", label) : theme.fg("text", label);
-					add(`${prefix}${styled}`);
+					pushWrappedLabel(lines, prefix, styled, width);
 					if (option.description) {
 						addWrapped(lines, theme.fg("muted", option.description), width, "     ");
 					}
@@ -804,7 +823,7 @@ async function askMultiChoice(
 					const marker = checked ? "[x]" : "[ ]";
 					const label = `${marker} ${item.index}. ${item.label}`;
 					const styled = isFocused ? theme.fg("accent", label) : theme.fg(checked ? "success" : "text", label);
-					add(`${prefix}${styled}`);
+					pushWrappedLabel(lines, prefix, styled, width);
 					if (item.description) {
 						addWrapped(lines, theme.fg("muted", item.description), width, "     ");
 					}

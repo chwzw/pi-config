@@ -11,12 +11,9 @@
     "git:github.com/DietrichGebert/ponytail",
     "npm:pi-background-tasks",
     "npm:pi-web-access",
-    "npm:@narumitw/pi-goal",
-    "git:github.com/amosblomqvist/pi-dictate",
-    "git:github.com/amosblomqvist/pi-observational-memory",
     "https://github.com/Leonxlnx/taste-skill",
     "npm:@juicesharp/rpiv-todo",
-    "npm:@narumitw/pi-usage"
+    "git:github.com/NVlabs/SoL-Pi"
   ],
   "tuiMode": "regular",
   "steeringMode": "all",

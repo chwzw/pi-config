@@ -113,7 +113,56 @@ A good plan is what makes the teaching feel inevitable instead of arbitrary.
 **Then present the plan in chat — always, before any teaching.** Two parts:
 
 1. **The approach, in prose.** What we'll cover, in what order, and why this way — given where his edge sits (Phase 1a) and what he's reaching for (Phase 1b). A few freeform sentences.
-2. **The dependency map.** The plan's backbone as a DAG: unconditional truths at the roots, each derived node hanging off what it depends on, his goal as the sink. Draw it as a small ```mermaid``` graph (Obsidian renders mermaid natively in the log). This map *is* the teaching order — Phase 3 builds it node by node. Keep it small: few nodes, short labels — a map, not the territory.
+2. **The dependency map.** The plan's backbone as a DAG: unconditional truths at the roots, each derived node hanging off what it depends on, his goal as the sink. Draw it as a small **ASCII dependency map** — plain text rendered directly into the TUI. Mermaid is not used. This map *is* the teaching order — Phase 3 builds it node by node. Keep it small: few nodes, short labels — a map, not the territory.
+
+   Use one of these shapes — pick whichever fits the graph best:
+
+   **Indented tree** (simplest, works for most lessons):
+
+   ```text
+   T1: PID 1 is userspace, started by kernel
+   └── T2: ALL services are descendants of PID 1
+       └── T3: Services need supervision (start, restart, stop)
+           ├── D1: SysV init (serial shell scripts) → slow, no real deps
+           └── systemd
+               ├── D3: declarative unit files
+               ├── D4: dependency graph → parallel boot
+               ├── D5: cgroups for process tracking
+               └── D6: many unit types (.service, .target, .socket, ...)
+                   └── D7: systemd IS PID 1 → unique powers  ← goal
+   ```
+
+   **Box + arrows** (when you want to show arrows crossing levels or grouping):
+
+   ```text
+   +----------------------------------+
+   | T1: PID 1 is userspace           |
+   +----------------+-----------------+
+                    |
+                    v
+   +----------------------------------+
+   | T2: ALL services are descendants |
+   |     of PID 1                     |
+   +----------------+-----------------+
+                    |
+          +---------+---------+
+          v                   v
+   +-------------+      +-------------+
+   | D1 SysV init|      |  systemd    |
+   |  (serial)   |      |             |
+   +------+------+      +------+------+
+          |                    |
+          v                    +------+------+
+      slow boot               v             v
+                         unit files    cgroups
+                              |             |
+                              +------+------+
+                                     |
+                                     v
+                              systemd IS PID 1
+   ```
+
+   Keep labels under ~40 chars so they don't wrap and break the shape. Use the indented tree by default; reach for boxes only when the graph has crossings or grouping that indenting can't show. The point is a glance-readable map, not art. Use plain ASCII (`+`, `-`, `|`) for borders by default — they survive any font/terminal. Box-drawing characters (`┌`, `─`, `│`, `▼`) look nicer but break under some fonts/encodings, so only use them when you know the terminal renders them.
 
 **Stress-test the roots before presenting.** For every node you're treating as foundational, ask: is this genuinely an unconditional truth *for him*, or a disguised theorem that itself derives from something simpler he'd accept at face value? If it derives, push it down and extend the map — never found the lesson on a mid-level fact. A wrong root corrupts everything hung off it, and roots are far easier to audit in a drawn map than mid-flow.
 

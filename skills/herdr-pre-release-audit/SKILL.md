@@ -1,4 +1,5 @@
 ---
+disable-model-invocation: true
 name: herdr-pre-release-audit
 description: Audit herdr release readiness by comparing commits since the base release against next-release changelog and docs. Use when asked to run or apply the repo's pre-release audit, validate docs/next before release, inspect issue refs that release CI will close, or finalize release docs for herdr.
 ---
