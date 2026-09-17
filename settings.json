@@ -7,12 +7,18 @@
   "defaultThinkingLevel": "high",
   "hideThinkingBlock": true,
   "packages": [
-    "npm:pi-subagents",
-    "git:github.com/DietrichGebert/ponytail",
-    "npm:pi-background-tasks",
+    {
+      "source": "git:github.com/DietrichGebert/ponytail",
+      "skills": [
+        "-skills/ponytail/SKILL.md",
+        "-skills/ponytail-audit/SKILL.md",
+        "-skills/ponytail-debt/SKILL.md",
+        "-skills/ponytail-gain/SKILL.md",
+        "-skills/ponytail-help/SKILL.md",
+        "-skills/ponytail-review/SKILL.md"
+      ]
+    },
     "npm:pi-web-access",
-    "https://github.com/Leonxlnx/taste-skill",
-    "npm:@juicesharp/rpiv-todo",
     "git:github.com/NVlabs/SoL-Pi"
   ],
   "tuiMode": "regular",
