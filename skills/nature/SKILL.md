@@ -1,6 +1,7 @@
 ---
 name: nature
-description: Paper workflow hub for Nature-family and high-impact journal work — drafting and restructuring manuscript sections, polishing or translating academic prose, adding and verifying citations and reference lists, literature search and full-text retrieval, Data Availability statements, statistical reporting audits, submission-grade figures, deep-reading paper cards and bilingual readers, mock peer review, reviewer response letters, paper-to-PPTX and paper-to-patent conversion, and experiment logging. Match the task below and read the sub-skill file before doing the work.
+description: Paper workflow hub for Nature-family and high-impact journal work. Manual only — invoke with `/nature`. Routes to sub-skills for drafting, citations, literature search, statistical audits, figures, peer review, reviewer responses, paper-to-PPTX/patent, etc.
+disable-model-invocation: true
 ---
 
 # nature — routing hub
