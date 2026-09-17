@@ -17,26 +17,26 @@ When a sub-skill references a relative path, resolve it against its own director
 
 | Task | Sub-skill to read |
 | --- | --- |
-| Draft or restructure manuscript sections, abstract, intro, discussion | `~/.pi/agent/skills/nature-writing/SKILL.md` |
-| Polish, restructure, or translate academic prose into Nature-leaning English | `~/.pi/agent/skills/nature-polishing/SKILL.md` |
-| Add citations to manuscript text, text→references, EndNote/RIS/Zotero export | `~/.pi/agent/skills/nature-citation/SKILL.md` |
-| Cross-verify a reference list field by field (authors, year, volume, DOI) | `~/.pi/agent/skills/nature-ref-verifier/SKILL.md` |
-| Multi-source literature search, citation verification, metric tables, citer profiling | `~/.pi/agent/skills/nature-academic-search/SKILL.md` |
-| Automated literature discovery pipeline (search→score→read→archive) | `~/.pi/agent/skills/nature-literature-pipeline/SKILL.md` |
-| Lawful full-text retrieval (OA, publisher API, CNKI/institutional access) | `~/.pi/agent/skills/nature-downloader/SKILL.md` |
-| Deep-reading Paper Card for one paper | `~/.pi/agent/skills/nature-paper-card/SKILL.md` |
-| Chinese-English side-by-side reader for a full paper | `~/.pi/agent/skills/nature-reader/SKILL.md` |
-| Publication-grade figures (matplotlib/seaborn, ggplot2, composites) | `~/.pi/agent/skills/nature-figure/SKILL.md` |
-| Statistical reporting audit or draft (p values, CIs, sample sizes) | `~/.pi/agent/skills/nature-statistics/SKILL.md` |
-| Data Availability statements, repository plans, FAIR metadata | `~/.pi/agent/skills/nature-data/SKILL.md` |
-| Simulate pre-submission peer review from the referee's side | `~/.pi/agent/skills/nature-reviewer/SKILL.md` |
-| Response/rebuttal letters, point-by-point replies, revision cover letters | `~/.pi/agent/skills/nature-response/SKILL.md` |
-| Paper → Nature-style Chinese PPTX (journal club, seminar, group meeting) | `~/.pi/agent/skills/nature-paper2ppt/SKILL.md` |
-| Slide images/screenshots/scanned PDFs → editable PPTX | `~/.pi/agent/skills/nature-image2ppt/SKILL.md` |
-| Paper/thesis/report → Chinese invention patent draft | `~/.pi/agent/skills/nature-paper-to-patent/SKILL.md` |
-| Standardised experiment logs (text/voice/images → Markdown) | `~/.pi/agent/skills/nature-experiment-log/SKILL.md` |
+| Draft or restructure manuscript sections, abstract, intro, discussion | `~/.pi/agent/nature-skills/nature-writing/SKILL.md` |
+| Polish, restructure, or translate academic prose into Nature-leaning English | `~/.pi/agent/nature-skills/nature-polishing/SKILL.md` |
+| Add citations to manuscript text, text→references, EndNote/RIS/Zotero export | `~/.pi/agent/nature-skills/nature-citation/SKILL.md` |
+| Cross-verify a reference list field by field (authors, year, volume, DOI) | `~/.pi/agent/nature-skills/nature-ref-verifier/SKILL.md` |
+| Multi-source literature search, citation verification, metric tables, citer profiling | `~/.pi/agent/nature-skills/nature-academic-search/SKILL.md` |
+| Automated literature discovery pipeline (search→score→read→archive) | `~/.pi/agent/nature-skills/nature-literature-pipeline/SKILL.md` |
+| Lawful full-text retrieval (OA, publisher API, CNKI/institutional access) | `~/.pi/agent/nature-skills/nature-downloader/SKILL.md` |
+| Deep-reading Paper Card for one paper | `~/.pi/agent/nature-skills/nature-paper-card/SKILL.md` |
+| Chinese-English side-by-side reader for a full paper | `~/.pi/agent/nature-skills/nature-reader/SKILL.md` |
+| Publication-grade figures (matplotlib/seaborn, ggplot2, composites) | `~/.pi/agent/nature-skills/nature-figure/SKILL.md` |
+| Statistical reporting audit or draft (p values, CIs, sample sizes) | `~/.pi/agent/nature-skills/nature-statistics/SKILL.md` |
+| Data Availability statements, repository plans, FAIR metadata | `~/.pi/agent/nature-skills/nature-data/SKILL.md` |
+| Simulate pre-submission peer review from the referee's side | `~/.pi/agent/nature-skills/nature-reviewer/SKILL.md` |
+| Response/rebuttal letters, point-by-point replies, revision cover letters | `~/.pi/agent/nature-skills/nature-response/SKILL.md` |
+| Paper → Nature-style Chinese PPTX (journal club, seminar, group meeting) | `~/.pi/agent/nature-skills/nature-paper2ppt/SKILL.md` |
+| Slide images/screenshots/scanned PDFs → editable PPTX | `~/.pi/agent/nature-skills/nature-image2ppt/SKILL.md` |
+| Paper/thesis/report → Chinese invention patent draft | `~/.pi/agent/nature-skills/nature-paper-to-patent/SKILL.md` |
+| Standardised experiment logs (text/voice/images → Markdown) | `~/.pi/agent/nature-skills/nature-experiment-log/SKILL.md` |
 
-Shared internals: `~/.pi/agent/skills/nature-shared/` holds references used by writing,
+Shared internals: `~/.pi/agent/nature-skills/nature-shared/` holds references used by writing,
 polishing, response, reader, and paper2ppt. Read it only when a sub-skill points there —
 never invoke it standalone.
 
