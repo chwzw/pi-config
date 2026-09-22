@@ -7,8 +7,8 @@ NPM_DIR="$HOME/.pi/agent/npm/node_modules"
 PATCH_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 apply() {
-	local pkg="$1" patch="$2"
-	local target="$NPM_DIR/$pkg"
+	local pkg="$1" patch="$2" base="${3:-$NPM_DIR}"
+	local target="$base/$pkg"
 	if [[ ! -d "$target" ]]; then
 		echo "skip: $pkg not installed"
 		return
@@ -24,5 +24,9 @@ apply() {
 	fi
 }
 
-# vim j/k navigation; d = stop task, D = stop all (was k/K/a)
+# vim j/k navigation; d = stop task, D = stop all (was k/K/a); src + dist runtime copies
 apply pi-background-tasks pi-background-tasks-vim-keys.patch
+# accent-only tint: drop the light-blue background blocks (src + dist runtime copies)
+apply pi-background-tasks pi-background-tasks-accent-tint.patch
+# then_run JSON-string shim: some models stringify nested tool args (src + tests)
+apply github.com/NVlabs/SoL-Pi sol-pi-action-fusion-then-run-shim.patch "$HOME/.pi/agent/git"

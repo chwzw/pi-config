@@ -9,6 +9,7 @@ trust.json
 run-history.jsonl
 missions/
 skills-removed-backup.tar.gz
+.pi/
 
 # caches / regenerable
 bin/

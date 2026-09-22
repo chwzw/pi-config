@@ -1,25 +1,21 @@
 {
   "httpProxy": "http://127.0.0.1:7890",
-  "lastChangelogVersion": "0.85.1",
+  "lastChangelogVersion": "0.87.0",
   "theme": "dark",
-  "defaultProvider": "minimax-cn",
-  "defaultModel": "MiniMax-M3",
+  "defaultProvider": "xiaomi-token-plan-cn",
+  "defaultModel": "mimo-v2.6-pro",
   "defaultThinkingLevel": "high",
   "hideThinkingBlock": true,
   "packages": [
+    "npm:pi-web-access",
+    "git:github.com/NVlabs/SoL-Pi",
     {
-      "source": "git:github.com/DietrichGebert/ponytail",
-      "skills": [
-        "-skills/ponytail/SKILL.md",
-        "-skills/ponytail-audit/SKILL.md",
-        "-skills/ponytail-debt/SKILL.md",
-        "-skills/ponytail-gain/SKILL.md",
-        "-skills/ponytail-help/SKILL.md",
-        "-skills/ponytail-review/SKILL.md"
+      "source": "npm:pi-background-tasks",
+      "extensions": [
+        "-dist/extensions/anthropic-attribution.js"
       ]
     },
-    "npm:pi-web-access",
-    "git:github.com/NVlabs/SoL-Pi"
+    "npm:pi-subagents"
   ],
   "tuiMode": "regular",
   "steeringMode": "all",

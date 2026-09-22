@@ -1,0 +1,82 @@
+diff --git a/src/sol-pi/extensions/action-fusion/index.ts b/src/sol-pi/extensions/action-fusion/index.ts
+index c27acf9..23e1f10 100644
+--- a/src/sol-pi/extensions/action-fusion/index.ts
++++ b/src/sol-pi/extensions/action-fusion/index.ts
+@@ -55,6 +55,27 @@ export interface ActionFusionOptions {
+  * Built-in tool definitions capture their cwd in closures, so keep one per
+  * working directory instead of rebuilding them on every call and every redraw.
+  */
++/**
++ * Some models send nested tool arguments as JSON strings (pi's built-in edit
++ * shim unwraps `edits` the same way). Unwrap `then_run` before schema
++ * validation rejects it with "must be object".
++ */
++function withThenRunShim<TArgs>(
++	base: ((args: unknown) => TArgs) | undefined,
++): (args: unknown) => TArgs {
++	return (input) => {
++		const args = base ? base(input) : (input as TArgs);
++		if (!args || typeof args !== "object") return args;
++		const record = args as Record<string, unknown>;
++		if (typeof record.then_run === "string") {
++			try {
++				record.then_run = JSON.parse(record.then_run);
++			} catch {}
++		}
++		return args;
++	};
++}
++
+ function memoizeByCwd<T>(create: (cwd: string) => T): (cwd: string) => T {
+ 	const cache = new Map<string, T>();
+ 	return (cwd) => {
+@@ -86,6 +107,7 @@ export function createActionFusionExtension(options: ActionFusionOptions = {}):
+ 		pi.registerTool<typeof editParameters, EditToolDetails | undefined>({
+ 			...editTemplate,
+ 			parameters: editParameters,
++			prepareArguments: withThenRunShim(editTemplate.prepareArguments),
+ 			async execute(toolCallId, input, signal, onUpdate, ctx) {
+ 				const { then_run, ...editInput } = input as typeof input & { then_run?: ThenRunInput };
+ 				const result = await executeMutationThenRun({
+@@ -120,6 +142,7 @@ export function createActionFusionExtension(options: ActionFusionOptions = {}):
+ 		pi.registerTool<typeof writeParameters, undefined>({
+ 			...writeTemplate,
+ 			parameters: writeParameters,
++			prepareArguments: withThenRunShim(writeTemplate.prepareArguments),
+ 			async execute(toolCallId, input, signal, onUpdate, ctx) {
+ 				const { then_run, ...writeInput } = input as typeof input & { then_run?: ThenRunInput };
+ 				const result = await executeMutationThenRun({
+diff --git a/tests/action-fusion.test.ts b/tests/action-fusion.test.ts
+index 8ae969f..770d3c8 100644
+--- a/tests/action-fusion.test.ts
++++ b/tests/action-fusion.test.ts
+@@ -420,3 +420,29 @@ describe("action fusion then_run", () => {
+ 		).rejects.toThrow("[then_run:skipped] target content changed after the fused mutation");
+ 	});
+ });
++
++describe("then_run argument shim", () => {
++	it("parses a JSON-string then_run before schema validation", () => {
++		const { edit, write } = loadFusedTools();
++		const editArgs = edit.prepareArguments?.({
++			path: "x.txt",
++			edits: [{ oldText: "a", newText: "b" }],
++			then_run: '{"command":"make test","timeout":30}',
++		});
++		expect(editArgs).toMatchObject({ then_run: { command: "make test", timeout: 30 } });
++		const writeArgs = write.prepareArguments?.({
++			path: "x.txt",
++			content: "hi",
++			then_run: '{"command":"node x.js"}',
++		});
++		expect(writeArgs).toMatchObject({ then_run: { command: "node x.js" } });
++	});
++
++	it("leaves object then_run untouched and keeps unparseable strings for the validator", () => {
++		const { write } = loadFusedTools();
++		const obj = { path: "x.txt", content: "hi", then_run: { command: "ls" } };
++		expect(write.prepareArguments?.(obj)).toMatchObject({ then_run: { command: "ls" } });
++		const bad = { path: "x.txt", content: "hi", then_run: "not json" };
++		expect(write.prepareArguments?.(bad)).toMatchObject({ then_run: "not json" });
++	});
++});

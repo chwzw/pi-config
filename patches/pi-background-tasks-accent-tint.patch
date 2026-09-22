@@ -1,0 +1,242 @@
+--- a/src/extension.ts
++++ b/src/extension.ts
+@@ -77,12 +77,6 @@
+ });
+ const PACKAGE_NAME = packageInfo.name ?? 'pi-background-tasks';
+ const PACKAGE_VERSION = packageInfo.version;
+-const LIGHT_BLUE_BG = '\x1b[48;2;183;223;255m';
+-const LIGHT_BLUE_FG = '\x1b[38;2;11;70;110m';
+-const ANSI_RESET = '\x1b[0m';
+-function lightBlue(value: string): string {
+-  return `${LIGHT_BLUE_BG}${LIGHT_BLUE_FG}${value}${ANSI_RESET}`;
+-}
+ 
+ function textContent(text: string) {
+   return [{ type: 'text' as const, text }];
+@@ -489,7 +483,7 @@
+       if (running.length === 0 && unseenFinishedCount === 0) {
+         ctx.ui.setStatus(
+           'background-tasks',
+-          updateSegment ? lightBlue(` bg ${updateSegment} `) : undefined,
++          updateSegment ? ctx.ui.theme.fg('accent', ` bg ${updateSegment} `) : undefined,
+         );
+         return;
+       }
+@@ -505,7 +499,7 @@
+       const segments = [...parts, entryHint];
+       if (updateSegment) segments.push(updateSegment);
+       const label = ` bg ${segments.join(' · ')} `;
+-      ctx.ui.setStatus('background-tasks', lightBlue(label));
++      ctx.ui.setStatus('background-tasks', ctx.ui.theme.fg('accent', label));
+     } catch (error) {
+       console.error(
+         `[background-tasks] UI update failed: ${error instanceof Error ? error.message : String(error)}`,
+--- a/src/ui/background-tasks-manager.ts
++++ b/src/ui/background-tasks-manager.ts
+@@ -32,10 +32,6 @@
+ const DETAIL_TAIL_BYTES = 128 * 1024;
+ const LIST_VISIBLE_ROWS = 14;
+ const DETAIL_VISIBLE_OUTPUT_LINES = 12;
+-const LIGHT_BLUE_BG = '\x1b[48;2;183;223;255m';
+-const LIGHT_BLUE_FG = '\x1b[38;2;11;70;110m';
+-const LIGHT_BLUE_BORDER = '\x1b[38;2;83;160;215m';
+-const ANSI_RESET = '\x1b[0m';
+ 
+ function formatTime(timestamp: number): string {
+   return new Date(timestamp).toLocaleTimeString();
+@@ -69,12 +65,9 @@
+   return value + ' '.repeat(Math.max(0, width - visibleWidth(value)));
+ }
+ 
+-function lightBlue(value: string): string {
+-  return `${LIGHT_BLUE_BG}${LIGHT_BLUE_FG}${value}${ANSI_RESET}`;
+-}
+-
+-function blueBorder(value: string): string {
+-  return `${LIGHT_BLUE_BORDER}${value}${ANSI_RESET}`;
++/** Accent-only tint: no background block, so the dock blends into Pi's TUI. */
++function accentText(theme: TaskManagerTheme, value: string): string {
++  return theme.fg('accent', value);
+ }
+ 
+ function statusLabel(status: BgTaskSnapshot['status']): string {
+@@ -575,14 +568,14 @@
+     width: number,
+   ): string[] {
+     const inner = Math.max(1, width - 2);
+-    const top = blueBorder(`╭${'─'.repeat(inner)}╮`);
+-    const bottom = blueBorder(`╰${'─'.repeat(inner)}╯`);
++    const top = accentText(this.theme, `╭${'─'.repeat(inner)}╮`);
++    const bottom = accentText(this.theme, `╰${'─'.repeat(inner)}╯`);
+     const row = (content = '') =>
+-      `${blueBorder('│')}${padAnsi(truncateToWidth(content, inner), inner)}${blueBorder('│')}`;
+-    const header = lightBlue(padAnsi(` ${title}`, inner));
++      `${accentText(this.theme, '│')}${padAnsi(truncateToWidth(content, inner), inner)}${accentText(this.theme, '│')}`;
++    const header = accentText(this.theme, padAnsi(` ${title}`, inner));
+     const subtitleLine = subtitle
+-      ? lightBlue(padAnsi(` ${subtitle}`, inner))
+-      : lightBlue(' '.repeat(inner));
++      ? accentText(this.theme, padAnsi(` ${subtitle}`, inner))
++      : ' '.repeat(inner);
+     const lines = [top, row(header), row(subtitleLine), row()];
+     for (const line of body) lines.push(row(line));
+     lines.push(row());
+@@ -637,12 +630,13 @@
+         if (!task) continue;
+         const index = this.listScroll + i;
+         const selected = index === this.selectedIndex;
+-        const pointer = selected ? '›' : ' ';
++        const pointer = selected ? this.theme.fg('accent', '›') : ' ';
+         const unseen = task.status !== 'running' && !this.options.isSeen(task.id);
+         const unreadMark = unseen ? this.theme.fg('warning', '●') : ' ';
+         const rawName = truncateChars(taskDisplayName(task), maxNameWidth);
+-        const name =
+-          task.status === 'failed'
++        const name = selected
++          ? this.theme.fg('accent', rawName)
++          : task.status === 'failed'
+             ? this.theme.fg('error', rawName)
+             : task.status === 'killed'
+               ? this.theme.fg('warning', rawName)
+@@ -665,7 +659,7 @@
+         const exit =
+           task.status !== 'running' ? this.theme.fg('dim', formatExitCodeText(task.exitCode)) : '';
+         let row = ` ${pointer} ${unreadMark} ${name} ${this.theme.fg('dim', task.id)} ${this.theme.fg('dim', '·')} ${status}${exit} ${this.theme.fg('dim', `${runtime} ${size}`)}${contextText}${modelText}${tokenText}${toolText}${activityText}`;
+-        if (selected) row = lightBlue(padAnsi(truncateToWidth(row, width - 4), width - 4));
++        if (selected) row = this.theme.bold(truncateToWidth(row, width - 4));
+         body.push(row);
+       }
+       if (tasks.length > LIST_VISIBLE_ROWS) {
+@@ -739,10 +733,10 @@
+ 
+   private renderOutputBox(width: number): string[] {
+     const inner = Math.max(1, width - 2);
+-    const top = ` ${blueBorder(`╭${'─'.repeat(inner)}╮`)}`;
+-    const bottom = ` ${blueBorder(`╰${'─'.repeat(inner)}╯`)}`;
++    const top = ` ${accentText(this.theme, `╭${'─'.repeat(inner)}╮`)}`;
++    const bottom = ` ${accentText(this.theme, `╰${'─'.repeat(inner)}╯`)}`;
+     const row = (content = '') =>
+-      ` ${blueBorder('│')}${padAnsi(truncateToWidth(content, inner), inner)}${blueBorder('│')}`;
++      ` ${accentText(this.theme, '│')}${padAnsi(truncateToWidth(content, inner), inner)}${accentText(this.theme, '│')}`;
+     const lines = [top];
+     if (this.tailError) {
+       lines.push(row(this.theme.fg('error', this.tailError)));
+--- a/dist/src/extension.js
++++ b/dist/src/extension.js
+@@ -29,12 +29,6 @@
+ });
+ const PACKAGE_NAME = packageInfo.name ?? 'pi-background-tasks';
+ const PACKAGE_VERSION = packageInfo.version;
+-const LIGHT_BLUE_BG = '\x1b[48;2;183;223;255m';
+-const LIGHT_BLUE_FG = '\x1b[38;2;11;70;110m';
+-const ANSI_RESET = '\x1b[0m';
+-function lightBlue(value) {
+-    return `${LIGHT_BLUE_BG}${LIGHT_BLUE_FG}${value}${ANSI_RESET}`;
+-}
+ function textContent(text) {
+     return [{ type: 'text', text }];
+ }
+@@ -334,7 +328,7 @@
+             const updateSegment = formatUpdateSegment(latestKnownVersion, PACKAGE_VERSION ?? '');
+             ctx.ui.setWidget('background-tasks', undefined);
+             if (running.length === 0 && unseenFinishedCount === 0) {
+-                ctx.ui.setStatus('background-tasks', updateSegment ? lightBlue(` bg ${updateSegment} `) : undefined);
++                ctx.ui.setStatus('background-tasks', updateSegment ? ctx.ui.theme.fg('accent', ` bg ${updateSegment} `) : undefined);
+                 return;
+             }
+             const parts = [];
+@@ -353,7 +347,7 @@
+             if (updateSegment)
+                 segments.push(updateSegment);
+             const label = ` bg ${segments.join(' · ')} `;
+-            ctx.ui.setStatus('background-tasks', lightBlue(label));
++            ctx.ui.setStatus('background-tasks', ctx.ui.theme.fg('accent', label));
+         }
+         catch (error) {
+             console.error(`[background-tasks] UI update failed: ${error instanceof Error ? error.message : String(error)}`);
+--- a/dist/src/ui/background-tasks-manager.js
++++ b/dist/src/ui/background-tasks-manager.js
+@@ -9,10 +9,6 @@
+ const DETAIL_TAIL_BYTES = 128 * 1024;
+ const LIST_VISIBLE_ROWS = 14;
+ const DETAIL_VISIBLE_OUTPUT_LINES = 12;
+-const LIGHT_BLUE_BG = '\x1b[48;2;183;223;255m';
+-const LIGHT_BLUE_FG = '\x1b[38;2;11;70;110m';
+-const LIGHT_BLUE_BORDER = '\x1b[38;2;83;160;215m';
+-const ANSI_RESET = '\x1b[0m';
+ function formatTime(timestamp) {
+     return new Date(timestamp).toLocaleTimeString();
+ }
+@@ -38,11 +34,9 @@
+ function padAnsi(value, width) {
+     return value + ' '.repeat(Math.max(0, width - visibleWidth(value)));
+ }
+-function lightBlue(value) {
+-    return `${LIGHT_BLUE_BG}${LIGHT_BLUE_FG}${value}${ANSI_RESET}`;
+-}
+-function blueBorder(value) {
+-    return `${LIGHT_BLUE_BORDER}${value}${ANSI_RESET}`;
++/** Accent-only tint: no background block, so the dock blends into Pi's TUI. */
++function accentText(theme, value) {
++    return theme.fg('accent', value);
+ }
+ function statusLabel(status) {
+     if (status === 'completed')
+@@ -512,13 +506,13 @@
+     }
+     frame(title, subtitle, body, footer, width) {
+         const inner = Math.max(1, width - 2);
+-        const top = blueBorder(`╭${'─'.repeat(inner)}╮`);
+-        const bottom = blueBorder(`╰${'─'.repeat(inner)}╯`);
+-        const row = (content = '') => `${blueBorder('│')}${padAnsi(truncateToWidth(content, inner), inner)}${blueBorder('│')}`;
+-        const header = lightBlue(padAnsi(` ${title}`, inner));
++        const top = accentText(this.theme, `╭${'─'.repeat(inner)}╮`);
++        const bottom = accentText(this.theme, `╰${'─'.repeat(inner)}╯`);
++        const row = (content = '') => `${accentText(this.theme, '│')}${padAnsi(truncateToWidth(content, inner), inner)}${accentText(this.theme, '│')}`;
++        const header = accentText(this.theme, padAnsi(` ${title}`, inner));
+         const subtitleLine = subtitle
+-            ? lightBlue(padAnsi(` ${subtitle}`, inner))
+-            : lightBlue(' '.repeat(inner));
++            ? accentText(this.theme, padAnsi(` ${subtitle}`, inner))
++            : ' '.repeat(inner);
+         const lines = [top, row(header), row(subtitleLine), row()];
+         for (const line of body)
+             lines.push(row(line));
+@@ -571,11 +565,13 @@
+                     continue;
+                 const index = this.listScroll + i;
+                 const selected = index === this.selectedIndex;
+-                const pointer = selected ? '›' : ' ';
++                const pointer = selected ? this.theme.fg('accent', '›') : ' ';
+                 const unseen = task.status !== 'running' && !this.options.isSeen(task.id);
+                 const unreadMark = unseen ? this.theme.fg('warning', '●') : ' ';
+                 const rawName = truncateChars(taskDisplayName(task), maxNameWidth);
+-                const name = task.status === 'failed'
++                const name = selected
++                    ? this.theme.fg('accent', rawName)
++                    : task.status === 'failed'
+                     ? this.theme.fg('error', rawName)
+                     : task.status === 'killed'
+                         ? this.theme.fg('warning', rawName)
+@@ -598,7 +594,7 @@
+                 const exit = task.status !== 'running' ? this.theme.fg('dim', formatExitCodeText(task.exitCode)) : '';
+                 let row = ` ${pointer} ${unreadMark} ${name} ${this.theme.fg('dim', task.id)} ${this.theme.fg('dim', '·')} ${status}${exit} ${this.theme.fg('dim', `${runtime} ${size}`)}${contextText}${modelText}${tokenText}${toolText}${activityText}`;
+                 if (selected)
+-                    row = lightBlue(padAnsi(truncateToWidth(row, width - 4), width - 4));
++                    row = this.theme.bold(truncateToWidth(row, width - 4));
+                 body.push(row);
+             }
+             if (tasks.length > LIST_VISIBLE_ROWS) {
+@@ -651,9 +647,9 @@
+     }
+     renderOutputBox(width) {
+         const inner = Math.max(1, width - 2);
+-        const top = ` ${blueBorder(`╭${'─'.repeat(inner)}╮`)}`;
+-        const bottom = ` ${blueBorder(`╰${'─'.repeat(inner)}╯`)}`;
+-        const row = (content = '') => ` ${blueBorder('│')}${padAnsi(truncateToWidth(content, inner), inner)}${blueBorder('│')}`;
++        const top = ` ${accentText(this.theme, `╭${'─'.repeat(inner)}╮`)}`;
++        const bottom = ` ${accentText(this.theme, `╰${'─'.repeat(inner)}╯`)}`;
++        const row = (content = '') => ` ${accentText(this.theme, '│')}${padAnsi(truncateToWidth(content, inner), inner)}${accentText(this.theme, '│')}`;
+         const lines = [top];
+         if (this.tailError) {
+             lines.push(row(this.theme.fg('error', this.tailError)));
